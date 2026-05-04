@@ -87,6 +87,7 @@ u(k) = Kp·e(k) + Ki·Σe(n) + Kd·(e(k) - e(k-1))
 - J0 release: 20ms，execution time: 75ms  
 - J1 release: 50ms，execution time: 75ms ← 插進來了！
 時間軸：
+<img width="617" height="199" alt="image" src="https://github.com/user-attachments/assets/3cd564a7-bd95-4569-b87f-b7347dfa66d2" />
 
 **J1 的計算：**
 - Release time = 50ms
