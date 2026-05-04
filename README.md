@@ -81,6 +81,11 @@ u(k) = Kp·e(k) + Ki·Σe(n) + Kd·(e(k) - e(k-1))
 | **Tardiness** | max(0, 完成時間 - deadline) |
 | **Slack time** | deadline 前的剩餘空閒時間 |
 
+假設 CPU 同時有兩個 job 要跑：
+
+- J0 release: 20ms，execution time: 75ms  
+- J1 release: 50ms，execution time: 75ms ← 插進來了！
+時間軸：
 **J1 的計算：**
 - Release time = 50ms
 - 但 CPU 在忙 J0，要等到 95ms 才能開始跑
