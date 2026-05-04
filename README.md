@@ -72,7 +72,7 @@ u(k) = Kp·e(k) + Ki·Σe(n) + Kd·(e(k) - e(k-1))
 |------|------|
 | **Job** | 系統排程執行的最小工作單位 |
 | **Task** | 一組相關 jobs 的集合 |
-| **Release time (r)** | job 可以開始執行的最早時間點 |
+| **Release time (r)** | job 可以開始執行的最早時間點，釋放時間可抖動 |
 | **Response time** | release time → 完成時間（≠ execution time） |
 | **Completion time** | job 完成執行的時間點 |
 | **Relative deadline (D)** | 最大允許的 response time |
