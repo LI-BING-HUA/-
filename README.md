@@ -81,6 +81,14 @@ u(k) = Kp·e(k) + Ki·Σe(n) + Kd·(e(k) - e(k-1))
 | **Tardiness** | max(0, 完成時間 - deadline) |
 | **Slack time** | deadline 前的剩餘空閒時間 |
 
+時間軸：
+
+20ms       50ms       95ms            170ms
+↑          ↑          ↑               ↑
+J0 release J1 release J0 完成         J1 完成
+|←──── J0 跑 75ms ────|
+           |← wait →|←──── J1 跑 75ms ────|
+           |←────── J1 response time 120ms ────────|
 假設 CPU 同時有兩個 job 要跑：
 
 - J0 release: 20ms，execution time: 75ms  
