@@ -80,6 +80,7 @@ u(k) = Kp·e(k) + Ki·Σe(n) + Kd·(e(k) - e(k-1))
 | **Feasible interval** | (rᵢ, dᵢ] |
 | **Tardiness** | max(0, 完成時間 - deadline) |
 | **Slack time** | deadline 前的剩餘空閒時間 |
+<img width="860" height="356" alt="image" src="https://github.com/user-attachments/assets/96c5999a-999c-4b5b-8be9-4314d7912e1b" />
 
 假設 CPU 同時有兩個 job 要跑：
 
