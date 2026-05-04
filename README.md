@@ -80,6 +80,7 @@ u(k) = Kp·e(k) + Ki·Σe(n) + Kd·(e(k) - e(k-1))
 | **Feasible interval** | (rᵢ, dᵢ] |
 | **Tardiness** | max(0, 完成時間 - deadline) |
 | **Slack time** | deadline 前的剩餘空閒時間 |
+
 **J1 的計算：**
 - Release time = 50ms
 - 但 CPU 在忙 J0，要等到 95ms 才能開始跑
