@@ -103,6 +103,11 @@ u(k) = Kp·e(k) + Ki·Σe(n) + Kd·(e(k) - e(k-1))
 簡單說：**CPU 只有一個，同時來兩個 job，後來的那個就要排隊等。**
 ### Hard vs. Soft Deadline 比較
 
+**兩個重要觀念：**
+
+-提早完成 hard deadline 沒有好處（準時就好）
+-要讓一串 jobs 的 response time jitter（抖動）越小越好（每次完成時間要穩定）
+
 | | **Hard** | **Soft** |
 |--|----------|----------|
 | 定義 | 未達成 = fatal fault | 未達成是 undesirable，但不致命 |
