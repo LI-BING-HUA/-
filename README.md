@@ -78,8 +78,7 @@ u(k) = Kp·e(k) + Ki·Σe(n) + Kd·(e(k) - e(k-1))
 | **Relative deadline (D)** | 最大允許的 response time |
 | **Absolute deadline (d)** | = release time + relative deadline |
 | **Feasible interval** | (rᵢ, dᵢ] |
-| **Tardiness** | 遲到了多少，max(0, 完成時間 - deadline) 
-準時或提早完成 → Tardiness = 0
+| **Tardiness** | 遲到了多少，max(0, 完成時間 - deadline) 準時或提早完成 → Tardiness = 0
 超過 deadline 才完成 → Tardiness = 超過了多少 ms|
 | **Slack time** | deadline 前的剩餘空閒時間 |
 
