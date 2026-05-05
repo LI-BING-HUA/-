@@ -105,8 +105,8 @@ u(k) = Kp·e(k) + Ki·Σe(n) + Kd·(e(k) - e(k-1))
 
 **兩個重要觀念：**
 
--提早完成 hard deadline 沒有好處（準時就好）
--要讓一串 jobs 的 response time jitter（抖動）越小越好（每次完成時間要穩定）
+- 提早完成 hard deadline 沒有好處（準時就好）
+- 要讓一串 jobs 的 response time jitter（抖動）越小越好（每次完成時間要穩定）
 
 | | **Hard** | **Soft** |
 |--|----------|----------|
