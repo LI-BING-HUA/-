@@ -156,6 +156,10 @@ u(k) = Kp·e(k) + Ki·Σe(n) + Kd·(e(k) - e(k-1))
 2. **Feasibility**：確認每個元件在硬體/軟體資源下可行
 3. **Schedulability**：確認整體系統行為符合 timing constraints
 
+規格寫對了嗎？       → Consistency
+單個元件跑得完嗎？   → Feasibility  
+全部一起跑沒問題嗎？ → Schedulability
+
 ---
 
 ## Ch3：A Reference Model of Real-Time Systems
