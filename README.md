@@ -145,6 +145,12 @@ u(k) = Kp·e(k) + Ki·Σe(n) + Kd·(e(k) - e(k-1))
 2. **Probabilistic**：以機率表達（如：P(response > 50ms) < 0.2）
 3. **Usefulness function**：以效用函數表達（如：usefulness ≥ 0.8）
 
+|  | Deterministic | Probabilistic | Usefulness |
+|--------|------|------|------|
+| 嚴格程度 | 最嚴 | 中等 | 最彈性 |
+| 驗證方式 | 最壞情況分析 | 統計分析 | 效用函數計算 |
+| 典型應用 | 飛控、煞車 | 電話網路 | 多媒體 |
+
 ### 系統驗證三步驟
 1. **Consistency**：確認 timing constraints 規格正確
 2. **Feasibility**：確認每個元件在硬體/軟體資源下可行
