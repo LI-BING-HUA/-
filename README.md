@@ -57,6 +57,12 @@ u(k) = Kp·e(k) + Ki·Σe(n) + Kd·(e(k) - e(k-1))
 
 > ⚠️ 任一假設不成立 → 需加入**狀態估計（State Estimation）**
 
+| 假設 | 對應問題 | 不成立時要加什麼 |
+|--------|------|------|
+| 無雜訊 | 感測器量不準 | Kalman Filter |
+| 資料 = 狀態 | 量到的不是你要的 | State Estimator） |
+| 參數已知 | Plant 會變化 | Adaptive Control |
+
 **進階控制**
 - **Kalman Filter**：每個取樣週期做矩陣乘加 + 一次矩陣反轉，過濾雜訊估計真實狀態
 - **Deadbeat Control**：純離散時間控制，無連續時間等效
