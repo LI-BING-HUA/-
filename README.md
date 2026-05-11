@@ -60,7 +60,7 @@ u(k) = Kp·e(k) + Ki·Σe(n) + Kd·(e(k) - e(k-1))
 | 假設 | 對應問題 | 不成立時要加什麼 |
 |--------|------|------|
 | 無雜訊 | 感測器量不準 | Kalman Filter |
-| 資料 = 狀態 | 量到的不是你要的 | State Estimator） |
+| 資料 = 狀態 | 量到的不是你要的 | State Estimator |
 | 參數已知 | Plant 會變化 | Adaptive Control |
 
 **進階控制**
