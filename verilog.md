@@ -25,34 +25,76 @@
 
 ---
 
-### 範例
+### 範例一:有給初值(假設 in = `4'b0100`)
 
-**case(完全比對)**
+**case** → 完全比對 `4'b0100`,沒這條 → 走 default,`out = 2'd0`
 
-    case (sel)
-        2'b00: y = a;
-        2'b01: y = b;
-        2'b10: y = c;
-        2'b11: y = d;
-        default: y = 0;
+    case (in)               // in = 4'b0100
+        4'b1000: out = 2'd3;
+        4'b0100: out = 2'd2; // ✅ 完全匹配
+        4'b0010: out = 2'd1;
+        4'b0001: out = 2'd0;
+        default: out = 2'd0;
     endcase
+    // out = 2'd2
 
-**casez(推薦寫 priority encoder)**
+**casez** → 第二條 `4'b01??` 中,`out = 2'd2`
 
-    casez (in)
-        4'b1???: out = 2'd3;    // 最高位是 1,其他不在乎
-        4'b01??: out = 2'd2;
+    casez (in)              // in = 4'b0100
+        4'b1???: out = 2'd3;
+        4'b01??: out = 2'd2; // ✅ 中
         4'b001?: out = 2'd1;
         4'b0001: out = 2'd0;
         default: out = 2'd0;
     endcase
+    // out = 2'd2
 
-**casex(不推薦)**
+**casex** → 第二條 `4'b01xx` 中,`out = 2'd2`
 
-    casex (in)
-        4'b1xxx: out = 2'd3; //執行這行就結束
-        4'b01xx: out = 2'd2; 
+    casex (in)              // in = 4'b0100
+        4'b1xxx: out = 2'd3;
+        4'b01xx: out = 2'd2; // ✅ 中
         4'b001x: out = 2'd1;
         4'b0001: out = 2'd0;
         default: out = 2'd0;
     endcase
+    // out = 2'd2
+
+→ 正常值下,三種行為一樣 ✅
+
+---
+
+### 範例二:沒給初值(in = `4'bxxxx`)
+
+**case** → x 嚴格比對,沒一條中 → 走 default,`out = 2'd0` ✅
+
+    case (in)               // in = 4'bxxxx
+        4'b1000: out = 2'd3;
+        4'b0100: out = 2'd2;
+        4'b0010: out = 2'd1;
+        4'b0001: out = 2'd0;
+        default: out = 2'd0; // ✅ 走這條
+    endcase
+    // out = 2'd0(安全)
+
+**casez** → x 不被當不在乎,沒一條中 → 走 default,`out = 2'd0` ✅
+
+    casez (in)              // in = 4'bxxxx
+        4'b1???: out = 2'd3;
+        4'b01??: out = 2'd2;
+        4'b001?: out = 2'd1;
+        4'b0001: out = 2'd0;
+        default: out = 2'd0; // ✅ 走這條
+    endcase
+    // out = 2'd0(安全)
+
+**casex** → 所有條都匹配,停在第一條 → `out = 2'd3` ⚠️
+
+    casex (in)              // in = 4'bxxxx
+        4'b1xxx: out = 2'd3; // ✅ 中這條就停,out = 2'd3
+        4'b01xx: out = 2'd2; // 也匹配,但走不到
+        4'b001x: out = 2'd1; // 也匹配,但走不到
+        4'b0001: out = 2'd0; // 也匹配,但走不到
+        default: out = 2'd0; // 永遠走不到 ⚠️
+    endcase
+    // out = 2'd3(bug 被掩蓋)
