@@ -18,7 +18,7 @@
 - 找到**第一個匹配**的就執行，然後跳出（不會繼續往下）
 - 都沒匹配 → 走 `default`
 
-差別**只在「怎麼算匹配」**，不在執行流程。
+差別**只在「怎麼算匹配」**,不在執行流程。
 
 ---
 
@@ -28,7 +28,7 @@
 |------|-------------|--------------|--------------|
 | `0` | 比對 0 | 比對 0 | 比對 0 |
 | `1` | 比對 1 | 比對 1 | 比對 1 |
-| `?` | 比對 `?`（不太合理） | **don't care** ✅ | **don't care** ✅ |
+| `?` | 比對 `?`(不太合理) | **don't care** ✅ | **don't care** ✅ |
 | `z` | 比對 `z` | **don't care** ✅ | **don't care** ✅ |
 | `x` | 比對 `x` | 比對 `x` | **don't care** ✅ |
 
@@ -38,65 +38,62 @@
 
 | 項目 | `case` | `casez` | `casex` |
 |------|--------|---------|---------|
-| **支援 don't care？** | ❌ 不支援 | ✅ 用 `?` 或 `z` | ✅ 用 `?`、`z`、`x` |
-| **遇到 x 訊號（bug）** | 不匹配 → 走 default | 不匹配 → 走 default | **錯誤匹配** → 第一條就中 ⚠️ |
-| **能掩蓋 bug？** | ❌ 不會 | ❌ 不會 | ✅ 會（危險） |
+| **支援 don't care?** | ❌ 不支援 | ✅ 用 `?` 或 `z` | ✅ 用 `?`、`z`、`x` |
+| **遇到 x 訊號(bug)** | 不匹配 → 走 default | 不匹配 → 走 default | **錯誤匹配** → 第一條就中 ⚠️ |
+| **能掩蓋 bug?** | ❌ 不會 | ❌ 不會 | ✅ 會(危險) |
 | **安全性** | ✅ 安全 | ✅ 安全 | ⚠️ 危險 |
-| **業界推薦？** | ✅ 一般用途 | ✅ 寫 priority encoder | ❌ **避免使用** |
+| **業界推薦?** | ✅ 一般用途 | ✅ 寫 priority encoder | ❌ **避免使用** |
 
 ---
 
 ### 四、語法範例
 
-**case（完全比對）**
-\`\`\`verilog
-case (sel)
-    2'b00: y = a;
-    2'b01: y = b;
-    2'b10: y = c;
-    2'b11: y = d;
-    default: y = 0;
-endcase
-\`\`\`
+**case(完全比對)**
 
-**casez（推薦寫 priority encoder）**
-\`\`\`verilog
-casez (in)
-    4'b1???: out = 2'd3;    // 最高位是 1，其他不在乎
-    4'b01??: out = 2'd2;
-    4'b001?: out = 2'd1;
-    4'b0001: out = 2'd0;
-    default: out = 2'd0;
-endcase
-\`\`\`
+    case (sel)
+        2'b00: y = a;
+        2'b01: y = b;
+        2'b10: y = c;
+        2'b11: y = d;
+        default: y = 0;
+    endcase
 
-**casex（不推薦）**
-\`\`\`verilog
-casex (in)
-    4'b1xxx: out = 2'd3;    // x 被當不在乎 → 訊號是 x 時會誤匹配 ⚠️
-endcase
-\`\`\`
+**casez(推薦寫 priority encoder)**
+
+    casez (in)
+        4'b1???: out = 2'd3;    // 最高位是 1,其他不在乎
+        4'b01??: out = 2'd2;
+        4'b001?: out = 2'd1;
+        4'b0001: out = 2'd0;
+        default: out = 2'd0;
+    endcase
+
+**casex(不推薦)**
+
+    casex (in)
+        4'b1xxx: out = 2'd3;    // x 被當不在乎 → 訊號是 x 時會誤匹配 ⚠️
+    endcase
 
 ---
 
-### 五、為什麼 `casex` 危險？
+### 五、為什麼 `casex` 危險?
 
-假設 `sel` 因為 bug 變成 `4'bxxxx`（未初始化或邏輯錯誤）：
+假設 `sel` 因為 bug 變成 `4'bxxxx`(未初始化或邏輯錯誤):
 
-| 寫法 | 第一條 `4'b1010` 會中嗎？ | 結果 |
+| 寫法 | 第一條 `4'b1010` 會中嗎? | 結果 |
 |------|--------------------------|------|
-| `case`  | ❌ x 嚴格比對，不匹配 | 走 default ✅ 安全 |
+| `case`  | ❌ x 嚴格比對,不匹配 | 走 default ✅ 安全 |
 | `casez` | ❌ x 不被當不在乎 | 走 default ✅ 安全 |
-| `casex` | ✅ x 被當不在乎，**全部 pattern 都「匹配」** | **執行第一條**，bug 被掩蓋 ⚠️ |
+| `casex` | ✅ x 被當不在乎,**全部 pattern 都「匹配」** | **執行第一條**,bug 被掩蓋 ⚠️ |
 
-`casex` 會讓壞訊號偷偷匹配到第一條，**default 永遠走不到**，debug 時超難抓。
+`casex` 會讓壞訊號偷偷匹配到第一條,**default 永遠走不到**,debug 時超難抓。
 
 ---
 
 ### 六、結論口訣
 
-> **要寫 don't care？用 `casez` 配 `?`，永遠別用 `casex`。**
+> **要寫 don't care?用 `casez` 配 `?`,永遠別用 `casex`。**
 
 - 一般選擇 → `case`
-- 需要 don't care（priority encoder、address decoder）→ `casez` + `?`
+- 需要 don't care(priority encoder、address decoder)→ `casez` + `?`
 - `casex` → **一輩子不用也沒關係** ❌
