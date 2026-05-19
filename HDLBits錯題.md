@@ -123,6 +123,27 @@
 
 ---
 
+### 🔴 Gatesv — 相鄰位元 both/any/different(卡超久)
+ 
+**卡點**
+- 被題目「左鄰 / 右鄰」繞暈,一直搞錯方向(i+1 還是 i-1)
+- 沒看清楚 **port 位寬**,自己宣告成 `[3:0]` 害後面要補東西繞彎
+- 誤以為 out_any 是「跟右邊所有位元」比(其實是「相鄰一個」)
+**頓悟點**
+- **本質就是「相鄰兩位做運算」**,「左/右」只是題目解釋的講法,程式碼一樣
+- 三個輸出**切法完全相同**,只差運算子:`&`(both)/ `|`(any)/ `^`(different)
+- **port 位寬要照官方**:`out_both [2:0]`、`out_any [3:1]`、`out_different [3:0]` ← 題目把「沒鄰居那位」直接從 port 拿掉,所以題目沒寫錯
+- out_different 唯一特殊:要**繞行**(最高位鄰居接回 in[0])
+- 解法(3 行):
+  ```verilog
+  assign out_both      = in[3:1] & in[2:0];
+  assign out_any       = in[3:1] | in[2:0];
+  assign out_different = in ^ {in[0], in[3:1]};
+  ```
+- 通用觀念:**HDLBits 有些題用「縮減的 port 位寬」處理邊界,務必看清楚 module 宣告**;「相鄰位元」題=錯開一位的兩段做運算
+
+---
+
 # 二、核心觀念整理
 
 ## 🔧 賦值與 latch
@@ -236,3 +257,11 @@
 8. wire 沒人驅動(`z`)或被重複驅動(multiple drivers)
 9. positional connection 接錯腳位
 10. BCD ≠ 二進位(超過 9 就進位)
+
+### 🔧 gate / dataflow / behavioral —「接一條線」也有三層級
+ 
+| 層級 | 寫法 | 接線範例 |
+|------|------|---------|
+| gate-level | gate primitive | `buf(out, in);` |
+| dataflow | assign | `assign out = in;` |
+| behavioral | always | `always @(*) out = in;` |
