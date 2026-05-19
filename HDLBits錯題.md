@@ -135,6 +135,7 @@
 - **port 位寬要照官方**:`out_both [2:0]`、`out_any [3:1]`、`out_different [3:0]` ← 題目把「沒鄰居那位」直接從 port 拿掉,所以題目沒寫錯
 - out_different 唯一特殊:要**繞行**(最高位鄰居接回 in[0])
 - 三種解法(各 3 行,效果相同):
+
   **① 切片(官方最簡潔,用縮減 port)**
   ```verilog
   assign out_both      = in[3:1] & in[2:0];
