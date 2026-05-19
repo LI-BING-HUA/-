@@ -134,12 +134,32 @@
 - 三個輸出**切法完全相同**,只差運算子:`&`(both)/ `|`(any)/ `^`(different)
 - **port 位寬要照官方**:`out_both [2:0]`、`out_any [3:1]`、`out_different [3:0]` ← 題目把「沒鄰居那位」直接從 port 拿掉,所以題目沒寫錯
 - out_different 唯一特殊:要**繞行**(最高位鄰居接回 in[0])
-- 解法(3 行):
+- 三種解法(各 3 行,效果相同):
+  **① 切片(官方最簡潔,用縮減 port)**
   ```verilog
   assign out_both      = in[3:1] & in[2:0];
   assign out_any       = in[3:1] | in[2:0];
   assign out_different = in ^ {in[0], in[3:1]};
   ```
+ 
+  **② 移位(用滿 port [3:0],邊界位算垃圾但不檢查)**
+  ```verilog
+  assign out_both      = (in >> 1) & in;
+  assign out_any       = (in >> 1) | in;
+  assign out_different = in ^ {in[0], in[3:1]};   // 繞行不能用移位
+  ```
+ 
+  **③ 拼接(用滿 port [3:0])**
+  ```verilog
+  assign out_both      = in & {1'b0, in[3:1]};
+  assign out_any       = in | {1'b0, in[3:1]};
+  assign out_different = in ^ {in[0], in[3:1]};
+  ```
+ 
+  **重點**:
+  - `in >> 1` ≡ `{1'b0, in[3:1]}`(移位補 0 = 拼接補 0,完全等價)
+  - **out_different 三版都一樣**:繞行(最高位接回 in[0])只能用拼接 `{in[0],in[3:1]}`,移位只會補 0 不會繞
+  - 版本①用官方縮減 port(`[2:0]`/`[3:1]`)最乾淨;②③用滿 port `[3:0]`,沒鄰居那位算垃圾值但測試不檢查
 - 通用觀念:**HDLBits 有些題用「縮減的 port 位寬」處理邊界,務必看清楚 module 宣告**;「相鄰位元」題=錯開一位的兩段做運算
 
 ---
