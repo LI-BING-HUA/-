@@ -602,7 +602,7 @@ endmodule
 
 **關鍵字翻譯**:
 - **同步**(synchronous)→ 敏感列表**只有 clk**,reset 寫在 if 裡
-- **非同步**(async)→ 敏感列表多加 `or posedge/negedge reset`
+- **非同步**(async)→ 多加 `or posedge/negedge reset`
 - **主動高**(active-high)→ `if (reset)`(不加 `~`)
 - **主動低**(active-low)→ `if (~reset)`
 
@@ -638,13 +638,15 @@ module top_module (
             q <= d;
     end
 endmodule
-
 ```
 
 ---
 
 ## Circuits - Sequemtial Logic - Latches and Flip-Flops - D Latch
 <img width="925" height="239" alt="image" src="https://github.com/user-attachments/assets/f88b882c-70ef-4a1b-af2c-308ea83164b1" />
+- **沒 else 是故意的** → 產生 latch(這次是要的功能,不是 bug)
+- Quartus 警告「latch inferred」是預期的,可無視
+- 平常組合邏輯沒 else = 不小心 latch(要避免);這題沒 else = 故意 latch(要的)
 - **沒 else 是故意的** → 產生 latch(這次是要的功能,不是 bug)
 - Quartus 警告「latch inferred」是預期的,可無視
 - 平常組合邏輯沒 else = 不小心 latch(要避免);這題沒 else = 故意 latch(要的)
