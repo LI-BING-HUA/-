@@ -311,7 +311,22 @@ endmodule
 ## Verilog Language - More verilog features - Generate for-loop : 100-digit BCD adder
 <img width="1580" height="381" alt="image" src="https://github.com/user-attachments/assets/d76e2e25-a700-4e3b-a70f-9cca5a97ef1f" />
 
-句型:a[start +: width](起點變數、寬度固定)
+### 句型
+
+```verilog
+a[start +: width]    // 從 start 往高位取 width 個 bit
+a[start -: width]    // 從 start 往低位取 width 個 bit
+```
+**起點可變、寬度固定**(寬度必須是常數)
+### 對照表
+
+| 寫法 | 等價於 |
+|------|--------|
+| `a[0 +: 4]` | `a[3:0]` |
+| `a[4 +: 4]` | `a[7:4]` |
+| `a[8 +: 4]` | `a[11:8]` |
+| `a[7 -: 4]` | `a[7:4]` |
+| `a[3 -: 4]` | `a[3:0]` |
 ### Write your solution here
 ```verilog
 module top_module (
