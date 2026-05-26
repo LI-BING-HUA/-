@@ -189,7 +189,6 @@ endmodule
 ---
 
 ## Verilog Language - Procedures - Avoiding latches
-<img width="1572" height="172" alt="image" src="https://github.com/user-attachments/assets/2b1afb15-0cd5-4873-937c-22546aaa11f9" />
 
 避免組合邏輯 latch 有兩招:
 - case 加 default — 適合 output 少(1 個)
