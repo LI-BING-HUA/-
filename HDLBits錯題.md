@@ -8,6 +8,17 @@
 for 迴圈不能直接寫在 module 裡,要放在:
 - always @(*)(行為描述)
 - generate 區塊(合成時展開)
+
+## 🟢Verilog Language - Vectors - Vector reversal 1
+<img width="1589" height="324" alt="image" src="https://github.com/user-attachments/assets/48eaebea-89a5-4322-82d4-956b96526d9f" />
+
+{a, b, c, d, e, f, 2'b11}     // ✅ 正確
+{a, b, c, d, e, f, 11}        // ⚠️ 危險!
+
+11 沒位寬,Verilog 會把它當成「預設 32-bit 整數」。所以:
+- 你以為的 11 = 想要的 2 個 bit(11)
+- Verilog 實際當成 32'd11 = 32'b00000000_00000000_00000000_00001011(32-bit!)
+
 ## 🟡 Adder100in (32-bit / 16-bit ripple carry adder)
 
 **題目**:用 add16(內含 16 個 add1)組成 32-bit 加法器
