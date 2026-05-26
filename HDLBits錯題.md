@@ -34,9 +34,8 @@ for 迴圈不能直接寫在 module 裡,要放在:
 ## 🟢Verilog Language - Modules:Hierachy - Modules and Vectors
 <img width="1305" height="424" alt="image" src="https://github.com/user-attachments/assets/4de56fcf-d60b-40dc-a946-2614e8963d02" />
 
-- 看到 always → output 是 reg ✅
+- 看到 always → ` output reg [7:0] q`
 
-` output reg [7:0] q`
 - Mux 想到 case ✅
 
 ## 🟡 Adder100in (32-bit / 16-bit ripple carry adder)
