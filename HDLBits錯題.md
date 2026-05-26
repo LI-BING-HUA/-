@@ -412,7 +412,7 @@ endmodule
   assign out_any       = in | {1'b0, in[3:1]};
   assign out_different = in ^ {in[0], in[3:1]};
   ```
-
+**邏輯 vs 位元:&&/||/!/==/!=(輸出 1-bit,判斷用)vs &/|/~/^(逐位,位元操作用)**
   **重點 : 題目out_both, out_any沒用滿 port [3:0], 所以不用管題目寫的左右**
 
 ### Write your solution here
