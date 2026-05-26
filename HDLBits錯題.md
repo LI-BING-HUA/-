@@ -13,6 +13,7 @@ for 迴圈不能直接寫在 module 裡,要放在:
 <img width="1589" height="324" alt="image" src="https://github.com/user-attachments/assets/48eaebea-89a5-4322-82d4-956b96526d9f" />
 
 {a, b, c, d, e, f, 2'b11}     // ✅ 正確
+
 {a, b, c, d, e, f, 11}        // ⚠️ 危險!
 
 11 沒位寬,Verilog 會把它當成「預設 32-bit 整數」。所以:
