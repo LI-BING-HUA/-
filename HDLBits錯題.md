@@ -2,14 +2,7 @@
 
 ---
 難度:🔴 看答案才懂 ｜ 🟡 卡很久但自己解出 ｜ 🟢 順順寫出
-## 🟢Verilog Language - Vectors - Vector reversal 1
-<img width="582" height="88" alt="image" src="https://github.com/user-attachments/assets/43bf5dbe-1193-47da-8369-7718898a3166" />
-
-for 迴圈不能直接寫在 module 裡,要放在:
-- always @(*)(行為描述)
-- generate 區塊(合成時展開)
-
-## 🟢Verilog Language - Vectors - Vector reversal 1
+## 🟢Verilog Language - Vectors - Vector concatenation operator
 <img width="1589" height="324" alt="image" src="https://github.com/user-attachments/assets/48eaebea-89a5-4322-82d4-956b96526d9f" />
 
 ```verilog
@@ -20,6 +13,20 @@ for 迴圈不能直接寫在 module 裡,要放在:
 11 沒位寬,Verilog 會把它當成「預設 32-bit 整數」。所以:
 - 你以為的 11 = 想要的 2 個 bit(11)
 - Verilog 實際當成 32'd11 = 32'b00000000_00000000_00000000_00001011(32-bit!)
+
+
+## 🟢Verilog Language - Vectors - Vector reversal 1
+<img width="582" height="88" alt="image" src="https://github.com/user-attachments/assets/43bf5dbe-1193-47da-8369-7718898a3166" />
+
+for 迴圈不能直接寫在 module 裡,要放在:
+- always @(*)(行為描述)
+- generate 區塊(合成時展開)
+
+## 🟢Verilog Language - Vectors - Replication operator
+<img width="1601" height="214" alt="image" src="https://github.com/user-attachments/assets/d93740aa-7efe-4780-b4dc-63a039e7b34d" />
+
+- **`{`**24{in[7]}, in**`}`** ❌ 語法錯!少一個 **`{`**
+- **`{`****`{`**24{in[7]}**`}`**, in**`}`** ✅ 正確,雙層
 
 ## 🟡 Adder100in (32-bit / 16-bit ripple carry adder)
 
