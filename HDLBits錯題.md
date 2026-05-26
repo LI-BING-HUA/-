@@ -624,6 +624,7 @@ endmodule
 | `'d` | decimal | `8'd52` |
 | `'h` | hex | `8'h34` |
 
+### Write your solution here
 ```verilog
 module top_module (
     input clk,
@@ -636,6 +637,41 @@ module top_module (
             q <= 8'h34;
         else
             q <= d;
+    end
+endmodule
+```
+
+---
+
+## Circuits - Sequemtial Logic - Latches and Flip-Flops - DFF with byte enable
+<img width="1558" height="199" alt="image" src="https://github.com/user-attachments/assets/9bd38fa1-7ac8-4c4c-b902-caf61884e45d" />
+
+- **byte enable**:每個 bit 控制一個位元組要不要更新
+  - `byteena[1]` 控制 d[15:8](上位元組)
+  - `byteena[0]` 控制 d[7:0](下位元組)
+  - 該位=1 → 更新、=0 → 鎖住保持
+- 寫法用「**if 沒 else**」實現「開關關閉時保持」:
+
+### Write your solution here
+```verilog
+module top_module (
+    input         clk,
+    input         resetn,         // 同步 reset, active-low
+    input  [1:0]  byteena,
+    input  [15:0] d,
+    output reg [15:0] q
+);
+    always @(posedge clk) begin
+        if (!resetn) begin
+            q <= 16'b0;            // reset 時整個清 0
+        end
+        else begin
+            if (byteena[1])        // 上 byte 開關
+                q[15:8] <= d[15:8];
+            if (byteena[0])        // 下 byte 開關
+                q[7:0]  <= d[7:0];
+            // 注意:沒 else!byteena=0 時就「不賦值」 → q 保持不變
+        end
     end
 endmodule
 ```
@@ -663,93 +699,7 @@ endmodule
 
 ---
 
-## 🟡 byteena(byte enable)16-bit DFF
-
-**卡點**
-- 不懂 byteena 在幹嘛
-- 不知道時序邏輯沒 else 不會 latch
-
-**頓悟點**
-- **byte enable**:每個 bit 控制一個位元組要不要更新
-  - `byteena[1]` 控制 d[15:8](上位元組)
-  - `byteena[0]` 控制 d[7:0](下位元組)
-  - 該位=1 → 更新、=0 → 鎖住保持
-- 寫法用「**if 沒 else**」實現「開關關閉時保持」:
-  ```verilog
-  always @(posedge clk) begin
-      if (byteena[1]) q[15:8] <= d[15:8];   // 沒 else,關閉時 q[15:8] 不動
-      if (byteena[0]) q[7:0]  <= d[7:0];
-  end
-  ```
-- **時序邏輯沒 else ≠ latch**,而是 flip-flop 保持原值(複習舊觀念)
-- 實際應用:CPU 寫入記憶體時只改部分 byte
-
----
-
-## 🔴 100-bit ripple carry(自己用 generate)
-
-**卡點**(同一個 ripple carry 觀念又踩 5 次語法雷)
-1. `carry[0] = cin;` 沒加 assign(module 內賦值必須用 assign 或 always)
-2. `for(...):add_loop` 標籤位置錯 → 應該 `for (...) begin : add_loop ... end`
-3. 迴圈從 `i = 1` 開始 → 漏 bit0,應該 `i = 0`
-4. `.cout(carry[i-1])` 方向反 → 應該 `carry[i+1]`(進位往上傳)
-5. `assign carry[100] = cout;` 方向反 → 應該 `assign cout = carry[100];`
-
-**頓悟點**
-- 用三元運算子處理邊界(替代 assign carry[0]=cin 和最後一條):
-  ```verilog
-  .cin(  i == 0 ? cin  : carry[i]),
-  .cout( i == N-1 ? cout : carry[i+1])
-  ```
-  迴圈內統一寫法,**省掉外面兩條 assign**,寫得更乾淨
-- **觀念懂(會用 generate、拆 add1、carry 線)和語法熟練度是兩件事**,初學會犯細節錯,多寫就熟
-
----
-
-## 🟢 Adder & signed overflow
-
-**卡點**
-- 不知道 overflow 怎麼判斷,亂寫 `a[7]+b[7]>1`、`a[6]+b[6]>1`
-- 不知道 8-bit signed 怎麼還原(`90` 算成 -113)
-
-**頓悟點**
-
-**Signed overflow 判斷(考試重點)**:
-```verilog
-assign overflow = (a[7] == b[7]) && (s[7] != a[7]);
-// 同號相加 + 結果反號 → overflow
-```
-- **必須看 s[7]**!沒看結果無法判斷
-- 規則:**同號相加結果變反號 → overflow**
-  - 正+正=負 ✓ overflow
-  - 負+負=正 ✓ overflow
-  - 一正一負 → 永不 overflow
-
-**二補數還原**(8-bit signed):
-
-```
-signed = unsigned - 2^N(N = bit 數)
-```
-
-- 4-bit:減 **16**(2^4)
-- 8-bit:減 **256**(2^8)
-- 16-bit:減 **65536**(2^16)
-
-例:`90`(hex)= unsigned 144,signed = 144 - 256 = **-112**
-
-**快速判正負**:hex 第一字 ≥ 8 → 負,< 8 → 正
-- `7f`、`70` 第一字 < 8 → 正
-- `80`、`90`、`ff` ≥ 8 → 負
-- **全 1 = -1**(`ff`、`ffff`、`ffffffff` 都是 -1,記起來)
-
----
-
-## 🟢 Testbench 動態次數(repeat)
-
-**卡點**
-- 想用 `{i{0}}` 重複 i 個 0,N 是變數不行
-
-**頓悟點**
+## Testbench 動態次數(repeat)
 
 | 寫法 | N 可變數? | 用途 |
 |------|-----------|------|
@@ -760,19 +710,6 @@ signed = unsigned - 2^N(N = bit 數)
 - **`{}` 是結構(電路位寬)、`repeat`/`for` 是行為(動作幾次)**,別混
 - testbench 印 N 個值用 `repeat (N) $display(...);`
 - 印 `$time` 用 **`%0g`**(避免醜空格),印變數用 **`%0d`**
-
----
-
-## 🟢 多 module 撞名(`top_module` 在多題都叫一樣)
-
-**卡點**
-- HDLBits 用其他題的 module(如 mt2015_q4a, q4b)組合,**那些題的 module 都叫 `top_module`**
-- 三個 `top_module` 同檔 → 撞名報錯
-
-**頓悟點**
-- **複製貼進來後手動改名**:把貼進來的副本 `module top_module` 那行改成 `mod_a`、`mod_b`
-- 原題 HDLBits 不用改(也改不了),改的是你貼進編輯框的副本
-- 然後主 `top_module` 實例化改名後的 `mod_a`/`mod_b`
 
 ---
 
