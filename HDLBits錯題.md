@@ -569,6 +569,7 @@ ab=11 → 走 mux_in[3]
 | mux_in[1] (ab=01) | K-map 第 2 欄 |
 | mux_in[2] (ab=10) | K-map **第 4 欄** ⚠️ |
 | mux_in[3] (ab=11) | K-map **第 3 欄** ⚠️ |
+
 每條 mux_in 是「**ab 固定後,只剩 c, d 的子函數**」。
 
 ### Write your solution here
