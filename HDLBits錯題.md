@@ -153,6 +153,20 @@ endmodule
 | **`z` 當 don't care** | ❌ 不支援 | ✅ 支援 | ✅ 支援 |
 | **`x` 當 don't care** | ❌ 不支援 | ❌ 不支援 | ⚠️ 支援(危險) |
 
+### ⚠️ casex 為什麼危險?
+
+訊號未初始化會是 `x`,假設 `sel = 3'bxxx`:
+
+```verilog
+casex (sel)
+    3'b001: a = 1;     // sel=xxx,因為 x 被當 don't care → 第一條就匹配!
+    3'b010: a = 2;
+    3'b100: a = 3;
+endcase
+```
+
+**第一條直接匹配** → 走 `a=1` → **bug 被掩蓋**,你以為功能正常,其實訊號是垃圾值。
+
 ```verilog
 module top_module (
     input [3:0] in,
