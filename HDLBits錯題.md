@@ -311,6 +311,7 @@ endmodule
 ## Verilog Language - More verilog features - Generate for-loop : 100-digit BCD adder
 <img width="1580" height="381" alt="image" src="https://github.com/user-attachments/assets/d76e2e25-a700-4e3b-a70f-9cca5a97ef1f" />
 
+### Write your solution here
 ```verilog
 module top_module (
     input  [399:0] a, b,
