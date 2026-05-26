@@ -453,7 +453,6 @@ default 全 0 等價寫法:
   out = 16'h0;
   out = '0;                    // SystemVerilog 簡潔寫法:'0 = 全 0
   ```
-**`'0` / `'1` 是 SystemVerilog 寫法**:
 
 ### Write your solution here
 ```verilog
