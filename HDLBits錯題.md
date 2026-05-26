@@ -262,19 +262,26 @@ endmodule
 
 ---
 
-## 🟡 Popcount255 (數有幾個 1)
 
-**卡點**
-- `out` 沒宣告 reg、組合邏輯誤用 `<=`
-- `out` 沒初始化 → 產生 latch、累加錯誤
-- 寫成 `out = out + 1`(無條件加)→ 結果永遠是 255
+## Verilog Language - More verilog features - Combinational for-loop : 255-bit population count
+<img width="1350" height="36" alt="image" src="https://github.com/user-attachments/assets/7e079dc5-0fe7-4ff0-8414-e1bbb2104c6d" />
 
-**頓悟點**
-- `always @(*)` 開頭先 `out = 0`,否則 latch
-- for 迴圈只是「重複動作」,判斷邏輯要寫進去
-- `out = out + in[i]`(Verilog 把 1-bit 當數值,是 1 加 1、是 0 加 0)比 `if` 簡潔
-- 進階:`$countones(in)` 或全部 `in[0]+in[1]+...` 相加
-
+### Write your solution here
+```verilog
+module top_module( 
+    input [254:0] in,
+    output reg [7:0] out );
+    integer i;
+    always @(*) begin
+        out = 0;
+        for (i = 0;i < 255; i = i + 1) begin
+            //if (in[i] == 1)
+            out = out + in[i];
+        end 
+    end
+    //assign out = $countones(in);      SystemVerilog 內建函式
+endmodule
+```
 ---
 
 ## 🟡 Parity (奇偶校驗)
