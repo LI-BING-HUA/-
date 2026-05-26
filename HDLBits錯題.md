@@ -89,7 +89,6 @@ module top_module (
     my_dff8 my_dff8_1(.clk(clk), .d(d),  .q(w1));
     my_dff8 my_dff8_2(.clk(clk), .d(w1), .q(w2));
     my_dff8 my_dff8_3(.clk(clk), .d(w2), .q(w3));
-    
     always @(*) begin
         case (sel)
             2'd0: q = d;
@@ -139,9 +138,7 @@ module top_module (
 );
     wire w1;
     wire [31:0] wxor;
-    
     assign wxor = {32{sub}} ^ b;
-    
     add16 add16_1(.a(a[15:0]),  .b(wxor[15:0]),  .cin(sub), .cout(w1), .sum(sum[15:0]));
     add16 add16_2(.a(a[31:16]), .b(wxor[31:16]), .cin(w1),  .cout(),   .sum(sum[31:16]));
 endmodule
@@ -178,7 +175,6 @@ endcase
 module top_module (
     input [3:0] in,
     output reg [1:0] pos  );
-    
     always @(*) begin
             casez(in)
                 4'b???1: pos = 2'd0;
@@ -188,7 +184,6 @@ module top_module (
                 default: pos = 2'd0;
             endcase
     end
-    
 endmodule
 ```
 
@@ -230,7 +225,6 @@ endmodule
 
 ```verilog
 genvar i;                            // ← genvar(不是 integer)
-
 generate
     for (i = 0; i < N; i = i + 1) begin : 標籤名   // 只一行也要 begin/end + 標籤
         // 要重複的東西(實例化、assign、邏輯閘)
@@ -262,7 +256,6 @@ endmodule
 
 ---
 
-
 ## Verilog Language - More verilog features - Combinational for-loop : 255-bit population count
 <img width="1350" height="36" alt="image" src="https://github.com/user-attachments/assets/7e079dc5-0fe7-4ff0-8414-e1bbb2104c6d" />
 
@@ -284,14 +277,34 @@ endmodule
 ```
 ---
 
-## 🟡 Parity (奇偶校驗)
+## Verilog Language - More verilog features - Generate for-loop : 100-bit binary adder 2
+<img width="1523" height="113" alt="image" src="https://github.com/user-attachments/assets/5d478d84-4f01-4ced-9f79-bb73736e7359" />
 
-**頓悟點**
-- Even parity bit = 所有資料位的 XOR
-- `assign parity = ^in;`(reduction XOR 一行搞定)
-- XOR 性質:成對的 1 互相消掉,剩下的就是「奇數個 1」
-- reduction:`&a` 全 1、`|a` 不為 0、`^a` 奇偶性;前面加 `~` 變 NAND/NOR/XNOR
 
+### Write your solution here
+```verilog
+module top_module( 
+    input [99:0] a, b,
+    input cin,
+    output [99:0] cout,
+    output [99:0] sum );
+    full_adder full_adder0(.a(a[0]), .b(b[0]), .cin(cin), .cout(cout[0]), .sum(sum[0]));
+    genvar i;
+    generate
+        for (i = 1; i < 100; i = i + 1) begin : add_chain
+            full_adder full_adder(.a(a[i]), .b(b[i]), .cin(cout[i - 1]), .cout(cout[i]), .sum(sum[i]));
+        end
+    endgenerate
+endmodule
+
+module full_adder (
+    input  a, b, cin,
+    output sum, cout
+);
+    assign sum  = a ^ b ^ cin;         
+    assign cout = ((a ^ b) & cin) | (a & b);
+endmodule
+```
 ---
 
 ## 🟡 Adder100 (100-bit ripple carry,自己寫 full_adder)
