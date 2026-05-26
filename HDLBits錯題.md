@@ -39,19 +39,9 @@ for 迴圈不能直接寫在 module 裡,要放在:
 - Mux 想到 case ✅
 
 ## 🟢Verilog Language - Modules:Hierachy - Adder-subtractor
+<img width="759" height="487" alt="image" src="https://github.com/user-attachments/assets/46db646a-33fe-4ff9-83e0-ff0e2ae6f732" />
 
-**題目**:用 add16(內含 16 個 add1)組成 32-bit 加法器
-
-**卡點**
-- 一開始連 module 怎麼拆都不懂
-- `add16` 自己也寫了 → 報錯 "module cannot be declared more than once"
-
-**頓悟點**
-- 結構:top → 2 個 add16 → 每個 16 個 add1,像積木層層疊
-- 看到題目寫 "you are given a module add16" → 那個不用自己寫,寫了反而衝突
-- `add1` 全加器公式:`sum = a^b^cin`、`cout = (a&b) | (cin&(a^b))` 或 `(a&b)|(a&cin)|(b&cin)`
-- `.cin(0)` 建議寫 `.cin(1'b0)`(明確 1-bit)
-
+`module add16 ( input[15:0] a, input[15:0] b, input cin, output[15:0] sum, output cout );`
 ---
 
 ## 🟢 Mux2to1 / 條件選擇 (sel_b1 & sel_b2)
