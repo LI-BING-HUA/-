@@ -41,7 +41,11 @@ for 迴圈不能直接寫在 module 裡,要放在:
 ## 🟢Verilog Language - Modules:Hierachy - Adder-subtractor
 <img width="759" height="487" alt="image" src="https://github.com/user-attachments/assets/46db646a-33fe-4ff9-83e0-ff0e2ae6f732" />
 
-`module add16 ( input[15:0] a, input[15:0] b, input cin, output[15:0] sum, output cout );`
+`module add16 ( input[15:0] a, 
+                input[15:0] b, 
+                input cin, 
+                output[15:0] sum, 
+                output cout );`
 ---
 
 ## 🟢 Mux2to1 / 條件選擇 (sel_b1 & sel_b2)
