@@ -588,6 +588,61 @@ endmodule
 
 ---
 
+## Circuits - Sequemtial Logic - Latches and Flip-Flops - DFF with reset value
+<img width="1525" height="78" alt="image" src="https://github.com/user-attachments/assets/6484f43e-c294-411f-98da-3019e22ba4e7" />
+
+**reset 四種組合**:
+
+| reset 類型 | 敏感列表 | if 判斷 |
+|-----------|---------|---------|
+| **同步 + active-high** | `@(posedge clk)` | `if (reset)` |
+| 同步 + active-low | `@(posedge clk)` | `if (~reset)` |
+| 非同步 + active-high | `@(posedge clk or posedge reset)` | `if (reset)` |
+| 非同步 + active-low | `@(posedge clk or negedge reset)` | `if (~reset)` |
+
+**關鍵字翻譯**:
+- **同步**(synchronous)→ 敏感列表**只有 clk**,reset 寫在 if 裡
+- **非同步**(async)→ 敏感列表多加 `or posedge/negedge reset`
+- **主動高**(active-high)→ `if (reset)`(不加 `~`)
+- **主動低**(active-low)→ `if (~reset)`
+
+**C/Python**:
+
+| 前綴 | 進位 | 例 |
+|------|------|-----|
+| (無) | 十進位 | `52` |
+| `0b` | 二進位 | `0b110100` |
+| `0o` | 八進位 | `0o64` |
+| `0x` | 十六進位 | `0x34` |
+
+**Verilog**:
+
+| 符號 | 進位 | 例 |
+|------|------|-----|
+| `'b` | binary | `8'b00110100` |
+| `'o` | octal | `8'o64` |
+| `'d` | decimal | `8'd52` |
+| `'h` | hex | `8'h34` |
+
+```verilog
+module top_module (
+    input clk,
+    input reset,
+    input [7:0] d,
+    output reg [7:0] q
+);
+    always @(negedge clk) begin
+        if (reset)
+            q <= 8'h34;
+        else
+            q <= d;
+    end
+endmodule
+
+```
+
+---
+
 ## Circuits - Sequemtial Logic - Latches and Flip-Flops - D Latch
 <img width="925" height="239" alt="image" src="https://github.com/user-attachments/assets/f88b882c-70ef-4a1b-af2c-308ea83164b1" />
 
@@ -605,38 +660,7 @@ module top_module (
     		q <= d;
     end
 endmodule
-
 ```
-
----
-
-## 🟢 同步 reset + 主動高 + 8-bit DFF + 各種變化
-
-**卡點**
-- 把同步 reset 寫成非同步(`@(posedge clk or posedge reset)`)
-- 主動高寫成 `if (~reset)` 反相
-- `0x34` 不知道是什麼
-
-**頓悟點**
-
-**reset 四種組合**(全部要會):
-
-| reset 類型 | 敏感列表 | if 判斷 |
-|-----------|---------|---------|
-| **同步 + active-high** | `@(posedge clk)` | `if (reset)` |
-| 同步 + active-low | `@(posedge clk)` | `if (~reset)` |
-| 非同步 + active-high | `@(posedge clk or posedge reset)` | `if (reset)` |
-| 非同步 + active-low | `@(posedge clk or negedge reset)` | `if (~reset)` |
-
-**關鍵字翻譯**:
-- **同步**(synchronous)→ 敏感列表**只有 clk**,reset 寫在 if 裡
-- **非同步**(async)→ 敏感列表多加 `or posedge/negedge reset`
-- **主動高**(active-high)→ `if (reset)`(不加 `~`)
-- **主動低**(active-low)→ `if (~reset)`
-
-**reset 重置值不是 0**:
-- `0x34`(C 語法)= **hex 34** = `8'h34`(Verilog 寫法)= `8'b00110100` = `8'd52`
-- Verilog **不認 `0x` 前綴**,要寫 `8'h34`
 
 ---
 
