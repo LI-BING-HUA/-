@@ -25,8 +25,11 @@ for 迴圈不能直接寫在 module 裡,要放在:
 ## 🟢Verilog Language - Vectors - Replication operator
 <img width="1601" height="214" alt="image" src="https://github.com/user-attachments/assets/d93740aa-7efe-4780-b4dc-63a039e7b34d" />
 
-- **`{`**24{in[7]}, in**`}`** ❌ 語法錯!少一個 **`{`**
-- **`{`****`{`**24{in[7]}**`}`**, in**`}`** ✅ 正確,雙層
+### Verilog 拼接:雙層大括號注意
+
+❌ 錯誤:`{24{in[7]}, in}` ← 少一個 `{`
+
+✅ 正確:`{{24{in[7]}}, in}` ← **外層** + **內層** 兩組 `{}`
 
 ## 🟡 Adder100in (32-bit / 16-bit ripple carry adder)
 
