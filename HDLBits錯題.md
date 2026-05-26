@@ -305,34 +305,52 @@ module full_adder (
     assign cout = ((a ^ b) & cin) | (a & b);
 endmodule
 ```
----
-
-## 🟡 Adder100 (100-bit ripple carry,自己寫 full_adder)
-
-**卡點**
-- 第 0 個全加器 `.cin()` 留空沒接 → 結果全錯
-- 實例名跟 module 同名 `full_adder full_adder(...)`
-
-**頓悟點**
-- 第 0 個 `.cin(cin)` 接外部進位,其他接 `cout[i-1]`
-- 實例名取不同名(如 `fa`),別跟 module 撞名
-- 這題 cout 是 100-bit → 可直接借 output cout 當進位線,不用另開 wire
-- `cout = ((a^b)&cin) | (a&b)` 建議加括號讓優先順序明確
 
 ---
 
-## 🔴 Bcdadd100 — BCD 100 位加法器
+## Verilog Language - More verilog features - Generate for-loop : 100-digit BCD adder
+<img width="1580" height="381" alt="image" src="https://github.com/user-attachments/assets/d76e2e25-a700-4e3b-a70f-9cca5a97ef1f" />
 
-**卡點**
-- 以為 BCD 就是普通二進位 → 錯!BCD 每位只能 0~9
-- `a[i*4 +: 4]` 切片語法不會讀
-- 不懂為什麼 `bcd_fadd` 要做「修正」
-
-**頓悟點**
-- BCD `7+5`:純二進位 = `1100`(12),但 BCD 不能輸出 12 → 修正成 `sum=0010`(2)、`cout=1`,跟小學「寫 2 進 1」一樣
-- 進位條件是「**超過 9**」,不是「4-bit 用盡(超過 15)」
-- `a[i*4 +: 4]` = 從 bit `i*4` 開始往上取 4 個 bit(Verilog 不准 `a[變數:變數]`,所以用 `+:` 起點可變、寬度固定)
-- `bcd_fadd` 是黑盒子,修正它處理好了,我只要串接力
+```verilog
+module top_module (
+    input  [399:0] a, b,
+    input          cin,
+    output         cout,
+    output [399:0] sum
+);
+    wire [99:0] carry;          // 99 條進位線(中間進位用)
+    
+    genvar i;
+    generate
+        for (i = 0; i < 100; i = i + 1) begin : bcd_loop
+            if (i == 0)
+                bcd_fadd fa (
+                    .a   ( a[3:0]   ),
+                    .b   ( b[3:0]   ),
+                    .cin ( cin      ),          // 第 0 個接外部 cin
+                    .cout( carry[0] ),
+                    .sum ( sum[3:0] )
+                );
+            else if (i == 99)
+                bcd_fadd fa (
+                    .a   ( a[i*4 +: 4]   ),
+                    .b   ( b[i*4 +: 4]   ),
+                    .cin ( carry[i-1]    ),
+                    .cout( cout          ),     // 最後一個接 cout(最終進位)
+                    .sum ( sum[i*4 +: 4] )
+                );
+            else
+                bcd_fadd fa (
+                    .a   ( a[i*4 +: 4]   ),
+                    .b   ( b[i*4 +: 4]   ),
+                    .cin ( carry[i-1]    ),     // 中間的接前一個 carry
+                    .cout( carry[i]      ),
+                    .sum ( sum[i*4 +: 4] )
+                );
+        end
+    endgenerate
+endmodule
+```
 
 ---
 
