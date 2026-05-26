@@ -14,6 +14,7 @@
 - 你以為的 11 = 想要的 2 個 bit(11)
 - Verilog 實際當成 32'd11 = 32'b00000000_00000000_00000000_00001011(32-bit!)
 
+---
 
 ## 🟢Verilog Language - Vectors - Vector reversal 1
 <img width="582" height="88" alt="image" src="https://github.com/user-attachments/assets/43bf5dbe-1193-47da-8369-7718898a3166" />
@@ -21,6 +22,8 @@
 for 迴圈不能直接寫在 module 裡,要放在:
 - always @(*)(行為描述)
 - generate 區塊(合成時展開)
+
+---
 
 ## 🟢Verilog Language - Vectors - Replication operator
 <img width="1601" height="214" alt="image" src="https://github.com/user-attachments/assets/d93740aa-7efe-4780-b4dc-63a039e7b34d" />
@@ -31,12 +34,16 @@ for 迴圈不能直接寫在 module 裡,要放在:
 
 ✅ 正確:`{{24{in[7]}}, in}` ← **外層** + **內層** 兩組 `{}`
 
+---
+
 ## 🟢Verilog Language - Modules:Hierachy - Modules and Vectors
 <img width="1305" height="424" alt="image" src="https://github.com/user-attachments/assets/4de56fcf-d60b-40dc-a946-2614e8963d02" />
 
 - 看到 always → ` output reg [7:0] q`
 
 - Mux 想到 case ✅
+
+---
 
 ## 🟢Verilog Language - Modules:Hierachy - Adder-subtractor
 <img width="759" height="487" alt="image" src="https://github.com/user-attachments/assets/46db646a-33fe-4ff9-83e0-ff0e2ae6f732" />
@@ -46,6 +53,7 @@ for 迴圈不能直接寫在 module 裡,要放在:
                 input cin, 
                 output[15:0] sum, 
                 output cout );`
+
 ---
 
 ## 🟢 Mux2to1 / 條件選擇 (sel_b1 & sel_b2)
