@@ -588,33 +588,25 @@ endmodule
 
 ---
 
-## 🟢 D Latch(D 鎖存器,故意產生 latch)
+## Circuits - Sequemtial Logic - Latches and Flip-Flops - D Latch
+<img width="925" height="239" alt="image" src="https://github.com/user-attachments/assets/f88b882c-70ef-4a1b-af2c-308ea83164b1" />
 
-**卡點**
-- 第一次遇到「**故意要 latch**」的題目,跟平常「避免 latch」相反
-
-**頓悟點**
-
-**D Latch vs DFF 差別**:
-
-| | D Latch | DFF |
-|--|---------|-----|
-| 觸發 | **電平**(level) | **邊緣**(edge) |
-| 寫法 | `always @(*)` | `always @(posedge clk)` |
-| ena=1 時 | q 跟著 d(透明) | (不適用) |
-| ena=0 時 | q 鎖住舊值 | (不適用) |
+**沒 else 是故意的** → 產生 latch(這次是要的功能,不是 bug)
+Quartus 警告「latch inferred」是預期的,可無視
+平常組合邏輯沒 else = 不小心 latch(要避免);這題沒 else = 故意 latch(要的)
 
 ```verilog
-module top_module (input d, input ena, output reg q);
+module top_module (
+    input d, 
+    input ena,
+    output q);
     always @(*) begin
-        if (ena) q <= d;   // 沒 else!ena=0 時 q 自然保持 → latch
+        if (ena)
+    		q <= d;
     end
 endmodule
-```
 
-- **沒 else 是故意的** → 產生 latch(這次是要的功能,不是 bug)
-- Quartus 警告「latch inferred」是預期的,可無視
-- 平常組合邏輯沒 else = 不小心 latch(要避免);這題沒 else = 故意 latch(要的)
+```
 
 ---
 
