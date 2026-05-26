@@ -14,6 +14,7 @@
 - 你以為的 11 = 想要的 2 個 bit(11)
 - Verilog 實際當成 32'd11 = 32'b00000000_00000000_00000000_00001011(32-bit!)
 
+### Write your solution here
 ```verilog
 module top_module (
     input  [4:0] a, b, c, d, e, f,
@@ -32,6 +33,7 @@ for 迴圈不能直接寫在 module 裡,要放在:
 - always @(*)(行為描述)
 - generate 區塊(合成時展開)
 
+### Write your solution here
 ```verilog
 module top_module (
     input  [7:0] in,
@@ -56,6 +58,7 @@ endmodule
 
 ✅ 正確:`{{24{in[7]}}, in}` ← **外層** + **內層** 兩組 `{}`
 
+### Write your solution here
 ```verilog
 module top_module (
     input  [7:0]  in,
@@ -74,6 +77,7 @@ endmodule
 
 - Mux 想到 case ✅
 
+### Write your solution here
 ```verilog
 module top_module (
     input        clk,
@@ -126,6 +130,7 @@ assign sum = {ws2, ws1};           // 最後拼接
 
 **選一個,別混用** → 混用就是 multiple drivers。
 
+### Write your solution here
 ```verilog
 module top_module (
     input  [31:0] a, b,
@@ -168,6 +173,7 @@ endcase
 
 **第一條直接匹配** → 走 `a=1` → **bug 被掩蓋**,你以為功能正常,其實訊號是垃圾值。
 
+### Write your solution here
 ```verilog
 module top_module (
     input [3:0] in,
@@ -194,6 +200,7 @@ endmodule
 - case 加 default — 適合 output 少(1 個)
 - 進 case 前先給所有 output 預設值 — 適合 output 多(這題 4 個)
 
+### Write your solution here
 ```verilog
 module top_module (
     input [15:0] scancode,
@@ -231,6 +238,7 @@ generate
 endgenerate
 ```
 
+### Write your solution here
 ```verilog
 module top_module( 
     input [99:0] in,
