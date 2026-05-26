@@ -38,7 +38,7 @@ for 迴圈不能直接寫在 module 裡,要放在:
 
 - Mux 想到 case ✅
 
-## 🟡 Adder100in (32-bit / 16-bit ripple carry adder)
+## 🟢Verilog Language - Modules:Hierachy - Adder-subtractor
 
 **題目**:用 add16(內含 16 個 add1)組成 32-bit 加法器
 
