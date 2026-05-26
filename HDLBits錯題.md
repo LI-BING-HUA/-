@@ -392,8 +392,6 @@ endmodule
 ## Circuits - Combinational Logic - Basic Gates - Gates and Vectors
 <img width="1578" height="405" alt="image" src="https://github.com/user-attachments/assets/d14961f1-6960-47a3-a146-ae1c040cbf29" />
 
-```
-
   **① 切片(官方最簡潔,用縮減 port)**
   ```verilog
   assign out_both      = in[3:1] & in[2:0];
