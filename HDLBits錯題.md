@@ -232,7 +232,7 @@ endmodule
 genvar i;                            // ← genvar(不是 integer)
 
 generate
-    for (i = 0; i < N; i = i + 1) begin : 標籤名   // ← begin 後面要 : 標籤
+    for (i = 0; i < N; i = i + 1) begin : 標籤名   // 只一行也要 begin/end + 標籤
         // 要重複的東西(實例化、assign、邏輯閘)
     end
 endgenerate
