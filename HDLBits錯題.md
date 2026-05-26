@@ -1,8 +1,8 @@
 # 📚 Verilog / HDLBits 學習總整理(完整版)
 
 ---
-
-## Verilog Language - Vectors - Vector reversal 1
+難度:🔴 看答案才懂 ｜ 🟡 卡很久但自己解出 ｜ 🟢 順順寫出
+## 🟢Verilog Language - Vectors - Vector reversal 1
 <img width="582" height="88" alt="image" src="https://github.com/user-attachments/assets/43bf5dbe-1193-47da-8369-7718898a3166" />
 
 for 迴圈不能直接寫在 module 裡,要放在:
