@@ -48,11 +48,27 @@ for 迴圈不能直接寫在 module 裡,要放在:
 ## 🟢Verilog Language - Modules:Hierachy - Adder-subtractor
 <img width="759" height="487" alt="image" src="https://github.com/user-attachments/assets/46db646a-33fe-4ff9-83e0-ff0e2ae6f732" />
 
-`module add16 ( input[15:0] a, 
-                input[15:0] b, 
-                input cin, 
-                output[15:0] sum, 
-                output cout );`
+`module add16 ( input[15:0] a, input[15:0] b, input cin, output[15:0] sum, output cout );`
+技巧 : assign wxor = {32{sub}} ^ b;
+誤點 : 
+### 兩種「組合輸出」寫法(選一個,不可混用)
+
+**方案 A:直接接 output(這題用這個)**
+```verilog
+add16 a1(... .sum(sum[15:0]));     // 直接接 sum 的低 16-bit
+add16 a2(... .sum(sum[31:16]));    // 直接接 sum 的高 16-bit
+// 結束,不用 assign sum
+```
+
+**方案 B:中間 wire 再拼接**
+```verilog
+wire [15:0] ws1, ws2;
+add16 a1(... .sum(ws1));
+add16 a2(... .sum(ws2));
+assign sum = {ws2, ws1};           // 最後拼接
+```
+
+**選一個,別混用** → 混用就是 multiple drivers。
 
 ---
 
