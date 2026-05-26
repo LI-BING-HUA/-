@@ -438,6 +438,7 @@ endmodule
 ---
 
 ## Circuits - Combinational Logic - Multiplexers - 9-to-1 multiplexer
+<img width="1451" height="43" alt="image" src="https://github.com/user-attachments/assets/c4ca2d1a-a4ac-48bf-80ae-b21ad8e0bc53" />
 
 default 全 1 等價寫法:
   ```verilog
