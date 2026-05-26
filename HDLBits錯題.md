@@ -4,9 +4,9 @@
 
 ## Verilog Language - Vectors - Vector reversal 1
 <img width="582" height="88" alt="image" src="https://github.com/user-attachments/assets/43bf5dbe-1193-47da-8369-7718898a3166" />
+
 for 迴圈不能直接寫在 module 裡,要放在:
-- always @(*)(行為描述)
-- generate 區塊(合成時展開)
+- 一開始連 module 怎麼拆都不懂
 
 ## 🟡 Adder100in (32-bit / 16-bit ripple carry adder)
 
