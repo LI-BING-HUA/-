@@ -1,8 +1,8 @@
 # 📚 Verilog / HDLBits 學習總整理(完整版)
 
 ---
-難度:🔴 看答案才懂 ｜ 🟡 卡很久但自己解出 ｜ 🟢 順順寫出
-## 🟢Verilog Language - Vectors - Vector concatenation operator
+難度:🔴 觀念類(理解卡關) ｜ 🟡 細節類(粗心 / 邊界) ｜ 🟢 語法類(寫法不熟)
+## Verilog Language - Vectors - Vector concatenation operator
 <img width="1589" height="324" alt="image" src="https://github.com/user-attachments/assets/48eaebea-89a5-4322-82d4-956b96526d9f" />
 
 ```verilog
@@ -25,7 +25,7 @@ endmodule
 
 ---
 
-## 🟢Verilog Language - Vectors - Vector reversal 1
+## Verilog Language - Vectors - Vector reversal 1
 <img width="582" height="88" alt="image" src="https://github.com/user-attachments/assets/43bf5dbe-1193-47da-8369-7718898a3166" />
 
 for 迴圈不能直接寫在 module 裡,要放在:
@@ -47,7 +47,7 @@ endmodule
 
 ---
 
-## 🟢Verilog Language - Vectors - Replication operator
+## Verilog Language - Vectors - Replication operator
 <img width="1601" height="214" alt="image" src="https://github.com/user-attachments/assets/d93740aa-7efe-4780-b4dc-63a039e7b34d" />
 
 ### Verilog 拼接:雙層大括號注意
@@ -67,7 +67,7 @@ endmodule
 
 ---
 
-## 🟢Verilog Language - Modules:Hierachy - Modules and Vectors
+## Verilog Language - Modules:Hierachy - Modules and Vectors
 <img width="1305" height="424" alt="image" src="https://github.com/user-attachments/assets/4de56fcf-d60b-40dc-a946-2614e8963d02" />
 
 - 看到 always → ` output reg [7:0] q`
@@ -100,7 +100,7 @@ endmodule
 
 ---
 
-## 🟢Verilog Language - Modules:Hierachy - Adder-subtractor
+## Verilog Language - Modules:Hierachy - Adder-subtractor
 <img width="759" height="487" alt="image" src="https://github.com/user-attachments/assets/46db646a-33fe-4ff9-83e0-ff0e2ae6f732" />
 
 `module add16 ( input[15:0] a, input[15:0] b, input cin, output[15:0] sum, output cout );`
@@ -143,16 +143,33 @@ endmodule
 ```
 
 ---
+## Verilog Language - Procedures - Priority encoder
+<img width="1572" height="172" alt="image" src="https://github.com/user-attachments/assets/2b1afb15-0cd5-4873-937c-22546aaa11f9" />
 
-## 🟢 Mux2to1 / 條件選擇 (sel_b1 & sel_b2)
+|  | `case` | `casez` | `casex` |
+|---|--------|---------|---------|
+| **完全匹配** | 才算中 | 才算中 | 才算中 |
+| **`?` 當 don't care** | ❌ 不支援 | ✅ 支援 | ✅ 支援 |
+| **`z` 當 don't care** | ❌ 不支援 | ✅ 支援 | ✅ 支援 |
+| **`x` 當 don't care** | ❌ 不支援 | ❌ 不支援 | ⚠️ 支援(危險) |
 
-**題目**:assign 版 + always 版各做一個 2-to-1 選擇
-
-**頓悟點**
-- 判斷用邏輯符號 `&&`,1-bit 訊號意圖明確
-- `assign out = (sel_b1 && sel_b2) ? b : a;`
-- always 版要 `output reg`,組合邏輯用 `=` 不用 `<=`
-- 同一邏輯可用三元 / if-else 兩種寫法表達
+```verilog
+module top_module (
+    input [3:0] in,
+    output reg [1:0] pos  );
+    
+    always @(*) begin
+            casez(in)
+                4'b???1: pos = 2'd0;
+                4'b??10: pos = 2'd1;
+                4'b?100: pos = 2'd2;
+                4'b1000: pos = 2'd3;
+                default: pos = 2'd0;
+            endcase
+    end
+    
+endmodule
+```
 
 ---
 
