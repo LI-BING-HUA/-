@@ -317,6 +317,7 @@ endmodule
 a[start +: width]    // 從 start 往高位取 width 個 bit
 a[start -: width]    // 從 start 往低位取 width 個 bit
 ```
+
 **起點可變、寬度固定**(寬度必須是常數)
 ### 對照表
 
@@ -327,6 +328,7 @@ a[start -: width]    // 從 start 往低位取 width 個 bit
 | `a[8 +: 4]` | `a[11:8]` |
 | `a[7 -: 4]` | `a[7:4]` |
 | `a[3 -: 4]` | `a[3:0]` |
+
 ### Write your solution here
 ```verilog
 module top_module (
@@ -371,19 +373,19 @@ endmodule
 
 ---
 
-## 🟢 Equality (2-bit A==B 比較,2015 midterm 1k)
+## Circuits - Combinational Logic - Basic Gates - Two-bit equality
 
-**卡點**
-- 第一版寫 `assign z = ~(A ^ B);` → 錯(`~(A^B)` 是 2-bit,z 只 1-bit,被截掉只剩最低位 → A=10,B=00 誤判 z=1)
+第一次寫 `assign z = ~(A ^ B);` → 錯(`~(A^B)` 是 2-bit,z 只 1-bit,被截掉只剩最低位 → A=10,B=00 誤判 z=1)
 
-**頓悟點**
-- 逐位運算結果是多 bit,但 z 只要 1-bit → **少了「把兩位比較結果合併」那一步**
-- 三種解法:
-  1. `assign z = &(~(A ^ B));` ← reduction AND:每位相同?→ 全部都相同?(我用這個)
-  2. `assign z = (A == B);` ← 最簡單,== 比較整個向量,輸出天生 1-bit
-  3. `assign z = (A[1]==B[1]) && (A[0]==B[0]);` ← 逐位展開
-- 通用觀念:位元運算(`~`/`^`)結果多 bit,要收成 1-bit 判斷得用 reduction 或 `==`
+### Write your solution here
+```verilog
+module top_module ( input [1:0] A, input [1:0] B, output z ); 
+    assign z = &(~(A ^ B));
+    //assign z = A == B;
+    //assign z = A[1] == B[1] && A[2] == B[2];
+endmodule
 
+```
 ---
 
 ## 🔴 Gatesv — 相鄰位元 both/any/different(卡超久)
