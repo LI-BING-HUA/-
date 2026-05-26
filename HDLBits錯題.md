@@ -1,12 +1,12 @@
 # 📚 Verilog / HDLBits 學習總整理(完整版)
 
-> 本筆記整理自學習過程中問過的所有題目與觀念
-> 過關標準:不看筆記、不問人,自己從零寫出來 ✅
-> 難度:🔴 看答案才懂 ｜ 🟡 卡很久但自己解出 ｜ 🟢 順順寫出
-
 ---
 
-# 一、做過的題目
+## Verilog Language - Vectors - Vector reversal 1
+<img width="582" height="88" alt="image" src="https://github.com/user-attachments/assets/43bf5dbe-1193-47da-8369-7718898a3166" />
+for 迴圈不能直接寫在 module 裡,要放在:
+- always @(*)(行為描述)
+- generate 區塊(合成時展開)
 
 ## 🟡 Adder100in (32-bit / 16-bit ripple carry adder)
 
