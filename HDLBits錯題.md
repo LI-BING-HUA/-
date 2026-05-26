@@ -1,7 +1,45 @@
 # 📚 Verilog / HDLBits 學習總整理(完整版)
 
 ---
+
 難度:🔴 觀念類(理解卡關) ｜ 🟡 細節類(粗心 / 邊界) ｜ 🟢 語法類(寫法不熟)
+
+---
+
+## 📋 題目目錄
+
+### Verilog Language
+- 🟢 Vectors - Vector concatenation operator
+- 🟢 Vectors - Vector reversal 1
+- 🟢 Vectors - Replication operator
+- 🟢 Modules: Hierarchy - Modules and Vectors
+- 🔴 Modules: Hierarchy - Adder-subtractor
+- 🟢 Procedures - Priority encoder
+- 🔴 Procedures - Avoiding latches
+- 🟢 More verilog features - Combinational for-loop: Vector reversal
+- 🟡 More verilog features - Combinational for-loop: 255-bit popcount
+- 🟡 More verilog features - Generate for-loop: 100-bit binary adder 2
+- 🔴 More verilog features - Generate for-loop: 100-digit BCD adder
+
+### Circuits - Combinational Logic
+- 🟡 Basic Gates - Two-bit equality
+- 🟡 Basic Gates - Gates and Vectors
+- 🟢 Multiplexers - 9-to-1 multiplexer
+- 🔴 Arithmetic - Signed addition overflow
+- 🔴 Karnaugh Map - Minimum SOP and POS
+- 🔴 Karnaugh Map - K-map implemented with a multiplexer
+
+### Circuits - Sequential Logic
+- 🟡 Latches and Flip-Flops - DFF with reset value
+- 🟡 Latches and Flip-Flops - DFF with byte enable
+- 🔴 Latches and Flip-Flops - D Latch
+
+### 附錄
+- 🔧 核心觀念整理(精簡版)
+- ⚠️ 最常踩雷 Top 20
+
+---
+
 ## Verilog Language - Vectors - Vector concatenation operator
 <img width="1589" height="324" alt="image" src="https://github.com/user-attachments/assets/48eaebea-89a5-4322-82d4-956b96526d9f" />
 
@@ -713,236 +751,131 @@ endmodule
 
 ---
 
-# 二、核心觀念整理
+# 🔧 核心觀念整理(精簡版)
 
-## 🔧 賦值與 latch
+## 賦值 & latch
+- **`<=`**:時序邏輯(`@(posedge clk)`);**`=`**:組合邏輯(`@(*)`)
+- **組合沒 else = latch**(要避免);**時序沒 else = 保持原值**(正常)
+- 避免 latch:case 加 default,或進 case 前先給所有 output 預設值
 
-- **`<=` vs `=`**:時序邏輯(`always @(posedge clk)`)用 `<=`;組合邏輯(`always @(*)`)用 `=`
-- **單一賦值時**兩者合成結果相同;**多賦值時**完全不同(blocking 循序、non-blocking 同時更新)
-- **latch 怎麼來**:`always @(*)` 有路徑沒賦值 → latch
-- **時序邏輯沒 else 是正常的**:會合成 flip-flop with enable(保持原值),不是 latch
-- **避免 latch 標準技巧**:`always @(*)` 進 case/if 前,先給所有 output 預設值
+## case 系列
+- 三者都「從上往下,第一個匹配就停」
+- **永遠用 `casez` + `?`**,別用 `casex`(x 當 don't care 會掩蓋 bug)
 
-## 🔧 case 系列
+## 邏輯 vs 位元運算子
 
-- **執行規則**:三者都是「從上往下,第一個匹配就停」
-- **don't care**:`case` 不支援;`casez` 用 `?`/`z`;`casex` 用 `?`/`z`/`x`
-- **危險**:訊號是 `x`(沒初始化)時,`casex` 所有 pattern 都匹配 → 停在第一條,bug 被掩蓋
-- **結論**:用 `casez` + `?`,永遠別用 `casex`
-- priority encoder 經典用 `casez`
+| 類型 | 運算子 | 結果寬度 | 用途 |
+|------|--------|---------|------|
+| **邏輯** | `&&` `\|\|` `!` `==` `!=` | 永遠 1-bit | 判斷真假 |
+| **位元** | `&` `\|` `~` `^` | 跟輸入同寬 | 逐位運算 |
 
-## 🔧 運算子
+- **reduction**:`&a`(全 1?)`|a`(不為 0?)`^a`(奇偶性)
+- **加減法器經典**:`{N{sub}} ^ b` + `cin = sub`
 
-- **邏輯 vs 位元**:`&&`/`||`/`!`(輸出 1-bit,判斷用)vs `&`/`|`/`~`(逐位,位元操作用)
-- 1-bit 時兩者結果相同,但用對符號意圖清楚、改位寬不會炸、過 lint
-- **判斷一律用邏輯符號**(`&&`、`||`、`!`、`==`、`!=`)
-- **reduction(單元)**:`&a`、`|a`、`^a` 一行處理整個向量
-- **XOR = 可程式化反相器**:`ctrl ^ data`,ctrl=1 反轉、ctrl=0 不變(加減法器用)
-- **1-bit 控制多 bit**:`{32{sub}} ^ b`(replication + XOR)
+## 數字進位
 
-## 🔧 位寬與數值
+**Verilog 寫法**(`位寬'進位 數值`):
+- `'b` binary / `'o` octal / `'d` decimal / **`'h` hex**(硬體最常用)
+- 位寬宣告 `[N:0]` 的 N 是十進位
 
-- 不同位寬可混合運算,窄的自動補 0 擴展
-- **1-bit + 1 = wrap**:`1'b1 + 1'b1 = 1'b0`(進位被截掉),等同 `~a`
-- wrap around 是 feature → 二補數負數:`-1` 在 4-bit = `1111`、32-bit = `FFFFFFFF`
-- **part-select**:`a[i*4 +: 4]` = 起點 `i*4` 往上取 4 個(變數索引唯一寫法,因為不准 `a[變數:變數]`)
-- 加法位寬要夠,否則溢位 wrap
+**易雷**:
+- `0x34`(C)→ Verilog 寫 **`8'h34`**
+- `4'h10` 是 16,4-bit 裝不下 → 用 `4'hA`~`4'hF`
+- **SystemVerilog**:`'0` = 全 0、`'1` = 全 1(自動配合位寬)
 
-## 🔧 數字進位前綴(各種寫法)
+## 重複運算子 `{N{x}}`
+- 雙層大括號:**`{N{內容}}`**,N 在外
+- N **必須常數**(動態重複用 `repeat`)
+- 內容寫 `1'b1` 明確位寬
 
-**C/Python 前綴**:
-- (無) = 十進位
-- `0b` = 二進位:`0b110100`
-- `0o` = 八進位:`0o64`
-- `0x` = 十六進位:`0x34`
-
-**Verilog 寫法**(不用 `0x`!):
+## part-select(`+:` / `-:`)
+```verilog
+a[start +: width]    // 從 start 往高位取 width 個
+a[start -: width]    // 從 start 往低位取 width 個
 ```
-位寬'進位 數值
-```
-- `'b` 二進位:`8'b00110100`
-- `'o` 八進位:`8'o64`
-- `'d` 十進位:`8'd52`
-- `'h` 十六進位:**`8'h34`**(硬體最常用)
+- 起點變數、寬度固定
+- generate 內變數切片**唯一寫法**(Verilog 不准 `a[變數:變數]`)
 
-**Hex 範圍寫法**:
-- 0~9 → `4'h0`~`4'h9`(用 h 或 d 都可,值一樣)
-- 10~15 → **`4'hA`~`4'hF`**(一個字母 = 4-bit,合法)
-- ⚠️ **`4'h10` 是 16,4-bit 裝不下**!10~15 要用 `4'hA`~`4'hF` 或 `4'd10`~`4'd15`
-- 全部統一用 `4'd` 最安全
-
-**SystemVerilog 無位寬常數**(超好用):
-- **`'0`** = 全部填 0(自動配合 LHS 位寬,任何寬度都對)
-- **`'1`** = 全部填 1(自動配合 LHS 位寬)
-- **`'x`** = 全部 x
-- **`'z`** = 全部 z
-- 例:`out = '1;`(out 16-bit → 自動變 16-bit 全 1;out 32-bit → 自動 32-bit 全 1)
-- 比寫 `{16{1'b1}}` 簡潔太多
-
-## 🔧 重複運算子 `{N{x}}`
+## generate 通式
 
 ```verilog
-{4{1'b1}} = 4'b1111      // 1 重複 4 次
-{16{1'b1}} = 16'hFFFF    // 16-bit 全 1
-{3{4'hA}} = 12'hAAA      // 1010 重複 3 次
+genvar i;
+generate
+    for (i = 0; i < N; i = i + 1) begin : 標籤
+        // 用三元處理邊界:i==0 ? cin : carry[i-1]
+    end
+endgenerate
 ```
+- 必須 **`genvar`**(不是 integer)
+- 必須 **`begin : 標籤`**
+- 用 **`assign`**(不是 `=`)
 
-- **格式**:**`{N{內容}}`**——N 在外,內容在內,**雙層大括號**
-- N **必須常數**(編譯時決定位寬)
-- N **要對應 output 的位寬**(out 是 16-bit 就重複 16 次)
-- 內容寫 `1'b1` 明確位寬,別寫 `1`(會被當 32-bit)
-- 大型訊號**用 `'0` / `'1`** 更簡潔
+## K-map 化簡
 
-## 🔧 宣告型別
+| 形式 | 圈什麼 | 0 對應 | 1 對應 | 項內 | 項間 |
+|------|--------|--------|--------|------|------|
+| **SOP** | 圈 1 | `~x` | `x` | `&` | `\|` |
+| **POS** | 圈 0 | `x` | `~x` | `\|` | `&` |
 
-- **`[大:小]`(如 `[15:0]`)**:左 MSB、右 LSB,符合二進位直覺,99% 用這個
-- **`[小:大]`(如 `[0:15]`)**:很少用,陣列才常見
-- **陣列**:`reg [7:0] mem [0:1023];`(bit 用 `[大:小]`,陣列用 `[小:大]`)
-- 陣列大小一定要寫範圍,不能只寫數字;`mem[1024]` 只有 SystemVerilog 才行
-- **testbench 型別**:input 用 `reg`(自己驅動),output 用 `wire`(被 DUT 驅動);DUT 內則相反
-- wire 可隱式宣告但別省,建議 `` `default_nettype none `` 強制宣告(抓錯字、位寬截斷)
+- 圈大小必須 2 的次方,可繞行
+- **棋盤格 = XOR**(奇偶校驗)
+- K-map 軸是 **Gray code(00,01,11,10)**,後兩欄(ab=11 vs 10)易看反
 
-## 🔧 module 與實例化
+## DFF / Latch / reset
 
-- **assign**:在當前 module 描述邏輯運算
-- **實例化**:拿現成 module 來用,`模組名 實例名 (.port(signal))`
-- **實例化本身就是有效電路**,不需額外 assign/always 啟動
-- **每條 wire 要恰好一個 driver**(assign / 實例 output / always 三選一),不能重複也不能沒有
-- **named connection**(`.port(signal)`)優於 positional(按順序),不易接錯、改 port 順序不壞
-- output 不用特別 assign 才輸出;裡面有人驅動,外面就看得到;已被驅動就別再 assign(multiple drivers)
+| 類型 | 寫法 |
+|------|------|
+| **D Latch** | `always @(*) if (ena) q <= d;`(沒 else = latch) |
+| **DFF** | `always @(posedge clk) q <= d;` |
+| **同步 reset** | `@(posedge clk)`,reset 寫 if 裡 |
+| **非同步 reset** | `@(posedge clk or posedge reset)` |
+| **active-high** | `if (reset)` |
+| **active-low** | `if (~reset)` |
 
-## 🔧 parameter / localparam
+- reset 重置值不一定是 0(可以 `q <= 8'h34;`)
+- 負邊觸發:`@(negedge clk)`
 
-- 位置:module 內訊號宣告區,或 `#( )` 內(`#( )` 只能放 parameter)
-- **parameter**:可從外部 override(可調參數,如位寬)
-- **localparam**:不可外部修改(內部固定常數,如 FSM 狀態編號)
-- 能用 localparam 就用,保護內部邏輯
-- 想用 parameter 決定 port 位寬 → 必須寫在 `#( )` 裡(順序問題)
-- 學習階段寫 module 內即可;做可重用 IP 才需要 `#( )`
-
-## 🔧 begin 區塊標籤
-
-- begin...end 預設沒名字;**裡面要宣告變數就必須加標籤**(`begin : label`)
-- 不宣告變數則標籤可有可無
-- SystemVerilog 可 `for (int i...)` 直接宣告,免標籤
-
-## 🔧 function / task
-
-- **function**:只 1 個回傳值(透過函數名),只能 input,`y = func(...)`,0 時間,不能有延遲
-- **task**:可多個 output,input/output/inout 都行,`task(...)`,可消耗時間,可有延遲
-- function 的 output = 函數名本身,位寬寫在名字前(`function [3:0] min_fun;`),內部對函數名賦值
-- RTL 多用 function(組合邏輯);task 多用在 testbench
-
-## 🔧 testbench 與時間
-
-- **`timescale 1ns/1ps`**:`#N` = N 個 ns,模擬精度到 1 ps;精度太粗會四捨五入
-- **多個 `initial` 並行**:時間 0 同時開跑、各跑各的(不是循序)
-- 典型分工:stimulus(產生輸入)/ `$monitor`(監看)/ `$finish`(timeout 保險絲)各一個 initial
-- **`$monitor`**:值有變就印,整個 tb 只能一個有效,要在訊號變化前(獨立 initial)啟動
-- `$display` 印一次、`$monitor` 持續、現代多用 VCD 波形(`$dumpfile`/`$dumpvars`)
-- **格式**:`%g` 印 `$time`(無醜空格);`%d` 印變數(`%0d` 緊貼);`%b` 二進位、`%h` 十六進位
-
-## 🔧 gate / dataflow / behavioral —「接一條線」也有三層級
-
-| 層級 | 寫法 | 接線範例 |
-|------|------|---------|
-| gate-level | gate primitive | `buf(out, in);` |
-| dataflow | assign | `assign out = in;` |
-| behavioral | always | `always @(*) out = in;` |
-
-## 🔧 gate-level vs RTL(設計層級)
-
-- 層級:switch → gate → dataflow(RTL,業界 99%)→ behavioral → HLS
-- gate-level 邏輯上更直接但規模不可行、難維護、綁死製程、封死合成器優化
-- 結論:用 RTL 思維,心裡知道合成出什麼閘即可,不必手畫電路
-- 真值表 = 邏輯式 = 電路圖,會列真值表就能寫 RTL(SOP:輸出為 1 的情況用 & 串、再 | 起來)
-
-## 🔧 K-map 化簡通則
-
-- **SOP**:圈 **1**,1→x, 0→~x,項內 `&`、項間 `|`
-- **POS**:圈 **0**,**0→x, 1→~x**(跟 SOP 相反!),項內 `|`、項間 `&`
-- 圈大小必須是 2 的次方(1, 2, 4, 8, 16)
-- 可繞行(左右、上下相連)
-- 圈越大化簡越多;**先找 8 格 → 4 格 → 2 格**
-- don't care 全當 1 用(SOP)/ 當 0 用(POS),圈大圈
-- **棋盤格 pattern = XOR**(odd parity),K-map 圈不出來,本質是 `^`
-- K-map 軸**是 Gray code 順序 00,01,11,10**,後兩欄容易看反
-
-## 🔧 DFF / Latch / reset 完整對照
-
-**D Latch(電平觸發)**:
-```verilog
-always @(*) if (ena) q <= d;     // 沒 else = latch 行為
-```
-
-**DFF(邊緣觸發)**:
-```verilog
-always @(posedge clk) q <= d;
-```
-
-**DFF + 同步 + active-high reset**:
-```verilog
-always @(posedge clk)
-    if (reset) q <= '0;
-    else       q <= d;
-```
-
-**DFF + 非同步 + active-high reset**:
-```verilog
-always @(posedge clk or posedge reset)
-    if (reset) q <= '0;
-    else       q <= d;
-```
-
-**reset 重置值不一定是 0**:可以 `q <= 8'h34;` 等任意值
-**負邊觸發**:`@(negedge clk)` 代替 `@(posedge clk)`
-
-## 🔧 signed overflow(8-bit)
-
-- 判斷:`(a[7] == b[7]) && (s[7] != a[7])`(同號相加 + 結果反號)
+## Signed overflow(8-bit)
+- 判斷:**`(a[7] == b[7]) && (s[7] != a[7])`**(同號相加 + 結果反號)
 - 二補數還原:**signed = unsigned − 2^N**
-- 8-bit 範圍 -128~127,16-bit -32768~32767
 
-## 🔧 波形圖讀法(Yours vs Ref + Mismatch)
+## module 實例化
+- **named connection**:`.port(signal)` 優於 positional
+- **每條 wire 恰好一個 driver**(避免 multiple drivers)
+- 實例名**不要跟 module 同名**
 
-- 4 區:Inputs / Yours / Ref / Mismatch
-- **Mismatch 凸起 = 你跟 Ref 不同;平的 = 一樣 ✅**
-- 逐欄(同一時段)對照 Yours 和 Ref 找差異
-- DFF 看 **clk 上升緣**那一刻 d 的值決定 q
-
-## 🔧 跑馬燈 / 計數器分頻(範例電路)
-
-- Counter:每 clk 加 1,數到 MAX 歸 0(像碼表,一直動)
-- State:平常不動,只在 `cnt == MAX` 後的 clk 邊緣旋轉一次(one-hot `{state[2:0],state[3]}`)
-- always 看的是「當下值」不是「下一個值」→ cnt==MAX 那刻 state 還沒動,下個邊緣才動
-- Counter 當分頻器,把高速 clk 變成人眼可見速度(MAX_CNT 決定快慢)
-- 效果:光點輪流亮,不會閃爍/全暗,直接「跳」到下一顆
+## testbench
+- `%0d` 印變數、`%0g` 印 `$time`
+- 動態次數用 **`repeat (N)`**(N 可變數,`{N{x}}` 不行)
 
 ---
 
-# 三、最常踩雷 Top 速查
+# ⚠️ 最常踩雷 Top 20
 
-1. 組合邏輯忘記初始化 / 沒涵蓋所有路徑 → **latch**
-2. `always @(*)` 用 `<=`、`always @(posedge clk)` 用 `=` → 慣例錯
-3. `casex` 害人 → 一律 `casez` + `?`
-4. 實例化第 0 個進位忘了接外部 cin
-5. `output reg` 忘了寫(always 驅動時)
-6. 變數索引切片寫成 `a[i+3:i]` → 要用 `a[i*4 +: 4]`
-7. 實例名跟 module 同名
-8. wire 沒人驅動(`z`)或被重複驅動(multiple drivers)
-9. positional connection 接錯腳位
-10. BCD ≠ 二進位(超過 9 就進位)
-11. **沒看 port 位寬**:HDLBits 有些題用縮減位寬(`[3:1]`、`[2:0]`)處理邊界
-12. **K-map 軸是 Gray code(00,01,11,10)**,後兩欄(ab=11 vs 10)容易看反
-13. **`4'h10` 不存在**(4-bit 裝不下 16)→ 10~15 用 `4'hA`~`4'hF` 或 `4'd10`~`4'd15`
-14. **`0x34` 是 C 語法,Verilog 要寫 `8'h34`**
-15. **`{N{x}}` 的 N 必須是常數**,要動態重複用 `repeat (N)`
-16. **同步 vs 非同步 reset**:差在敏感列表有沒有 `or posedge reset`
-17. **主動高 vs 主動低**:`if (reset)` vs `if (~reset)`,別反相搞錯
-18. **多 module 同名(top_module)→ 改名再貼**(`mod_a`、`mod_b`)
-19. **POS 規則跟 SOP 完全相反**(0→x、1→~x、項內 `|`)
-20. **signed overflow 必須看 s[7]**,光看輸入位元抓不到
-21. **D Latch 故意沒 else**(平常避免 latch、但這題要 latch)
-22. **時序邏輯沒 else ≠ latch**(=保持原值,正常)
-23. **gate primitive 只接訊號**,不能放 `a&b` 這種運算式
-24. **`'0` / `'1`**(SystemVerilog)= 自動填滿位寬全 0/1,比 `{N{1'b1}}` 簡潔
+| # | 雷 |
+|---|-----|
+| 1 | 組合邏輯沒涵蓋所有路徑 → **latch** |
+| 2 | `output reg` 忘了寫(always 驅動時) |
+| 3 | `casex` 害人 → 一律 `casez` + `?` |
+| 4 | 變數索引切片要用 **`a[i*4 +: 4]`**,不是 `a[i+3:i]` |
+| 5 | 實例名跟 module 同名 |
+| 6 | wire 沒驅動 / 重複驅動(multiple drivers) |
+| 7 | **`4'h10` 不存在**(裝不下)→ 用 `4'hA`~`4'hF` |
+| 8 | **`0x34` 是 C 語法**,Verilog 寫 `8'h34` |
+| 9 | **`{N{x}}` 的 N 必須常數**,動態用 `repeat` |
+| 10 | **同步 vs 非同步 reset**:差敏感列表有無 `or posedge reset` |
+| 11 | **主動高 vs 主動低**:`if (reset)` vs `if (~reset)` |
+| 12 | **POS 跟 SOP 規則完全相反**(0→x、項內 `\|`) |
+| 13 | **signed overflow 必須看 s[7]** |
+| 14 | **K-map 軸是 Gray code**,後兩欄(ab=11 vs 10)易看反 |
+| 15 | BCD ≠ 二進位(超過 9 就進位) |
+| 16 | 多 module 同名 → **改名為 `mod_a`/`mod_b`** |
+| 17 | **`'0`/`'1`** 比 `{N{1'b1}}` 簡潔(SystemVerilog) |
+| 18 | **加減法器**:`{N{sub}} ^ b` + `cin = sub` |
+| 19 | **D Latch 故意沒 else**(平常避免、這題要) |
+| 20 | **時序沒 else ≠ latch**(=保持原值,正常) |
+
+| 21 | `~(A^B)` 是多 bit,1-bit 接收會被截斷 → 用 `&` reduction 或 `==` |
+| 22 | 沒看 port 位寬:HDLBits 有些題用縮減位寬(`[3:1]`、`[2:0]`)處理邊界 |
+| 23 | 拼接 `{}` 內常數必須有位寬(`{a, 11}` ⚠️ 11 變 32-bit) |
+| 24 | gate primitive 只接訊號,不能放 `a&b` 運算式 |
