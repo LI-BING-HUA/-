@@ -14,6 +14,15 @@
 - 你以為的 11 = 想要的 2 個 bit(11)
 - Verilog 實際當成 32'd11 = 32'b00000000_00000000_00000000_00001011(32-bit!)
 
+```verilog
+module top_module (
+    input  [4:0] a, b, c, d, e, f,
+    output [7:0] w, x, y, z
+);
+    assign {w, x, y, z} = {a, b, c, d, e, f, 2'b11};
+endmodule
+```
+
 ---
 
 ## 🟢Verilog Language - Vectors - Vector reversal 1
@@ -22,6 +31,19 @@
 for 迴圈不能直接寫在 module 裡,要放在:
 - always @(*)(行為描述)
 - generate 區塊(合成時展開)
+
+```verilog
+module top_module (
+    input  [7:0] in,
+    output reg [7:0] out
+);
+    integer i;
+    always @(*) begin
+        for (i = 0; i < 8; i = i + 1)
+            out[i] = in[7-i];
+    end
+endmodule
+```
 
 ---
 
@@ -34,6 +56,15 @@ for 迴圈不能直接寫在 module 裡,要放在:
 
 ✅ 正確:`{{24{in[7]}}, in}` ← **外層** + **內層** 兩組 `{}`
 
+```verilog
+module top_module (
+    input  [7:0]  in,
+    output [31:0] out
+);
+    assign out = {{24{in[7]}}, in};
+endmodule
+```
+
 ---
 
 ## 🟢Verilog Language - Modules:Hierachy - Modules and Vectors
@@ -42,6 +73,30 @@ for 迴圈不能直接寫在 module 裡,要放在:
 - 看到 always → ` output reg [7:0] q`
 
 - Mux 想到 case ✅
+
+```verilog
+module top_module (
+    input        clk,
+    input  [7:0] d,
+    input  [1:0] sel,
+    output reg [7:0] q
+);
+    wire [7:0] w1, w2, w3;
+    my_dff8 my_dff8_1(.clk(clk), .d(d),  .q(w1));
+    my_dff8 my_dff8_2(.clk(clk), .d(w1), .q(w2));
+    my_dff8 my_dff8_3(.clk(clk), .d(w2), .q(w3));
+    
+    always @(*) begin
+        case (sel)
+            2'd0: q = d;
+            2'd1: q = w1;
+            2'd2: q = w2;
+            2'd3: q = w3;
+        endcase
+    end
+endmodule
+```
+
 
 ---
 
@@ -70,6 +125,22 @@ assign sum = {ws2, ws1};           // 最後拼接
 ```
 
 **選一個,別混用** → 混用就是 multiple drivers。
+
+```verilog
+module top_module (
+    input  [31:0] a, b,
+    input         sub,
+    output [31:0] sum
+);
+    wire w1;
+    wire [31:0] wxor;
+    
+    assign wxor = {32{sub}} ^ b;
+    
+    add16 add16_1(.a(a[15:0]),  .b(wxor[15:0]),  .cin(sub), .cout(w1), .sum(sum[15:0]));
+    add16 add16_2(.a(a[31:16]), .b(wxor[31:16]), .cin(w1),  .cout(),   .sum(sum[31:16]));
+endmodule
+```
 
 ---
 
