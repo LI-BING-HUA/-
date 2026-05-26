@@ -292,7 +292,7 @@ module top_module(
     genvar i;
     generate
         for (i = 1; i < 100; i = i + 1) begin : add_chain
-            full_adder full_adder(.a(a[i]), .b(b[i]), .cin(cout[i - 1]), .cout(cout[i]), .sum(sum[i]));
+            full_adder full_adderu(.a(a[i]), .b(b[i]), .cin(cout[i - 1]), .cout(cout[i]), .sum(sum[i]));
         end
     endgenerate
 endmodule
