@@ -143,6 +143,7 @@ endmodule
 ```
 
 ---
+
 ## Verilog Language - Procedures - Priority encoder
 <img width="1572" height="172" alt="image" src="https://github.com/user-attachments/assets/2b1afb15-0cd5-4873-937c-22546aaa11f9" />
 
@@ -187,14 +188,31 @@ endmodule
 
 ---
 
-## 🟢 簡單條件輸出 (cpu_overheated / keep_driving)
+## Verilog Language - Procedures - Avoiding latches
+<img width="1572" height="172" alt="image" src="https://github.com/user-attachments/assets/2b1afb15-0cd5-4873-937c-22546aaa11f9" />
 
-**卡點**:`keep_driving = gas_tank_empty;` 邏輯錯
+避免組合邏輯 latch 有兩招:
+- case 加 default — 適合 output 少(1 個)
+- 進 case 前先給所有 output 預設值 — 適合 output 多(這題 4 個)
 
-**頓悟點**
-- 到達目的地後,不管油箱狀態都不該繼續開 → else 那條應該是常數,不是 `gas_tank_empty`
-- 想清楚「這個情況下答案是不是固定值」
-
+```verilog
+module top_module (
+    input [15:0] scancode,
+    output reg left,
+    output reg down,
+    output reg right,
+    output reg up  ); 
+always @(*) begin
+    up = 1'b0; down = 1'b0; left = 1'b0; right = 1'b0;// ← 先把 4 個都設 0
+    case (scancode)
+        16'he06b: left  = 1'b1;
+        16'he072: down  = 1'b1;
+        16'he074: right = 1'b1;
+        16'he075: up    = 1'b1;
+    endcase
+end
+endmodule
+```
 ---
 
 ## 🟡 Vector reversal (位元反向)
