@@ -413,7 +413,7 @@ endmodule
   assign out_different = in ^ {in[0], in[3:1]};
   ```
 
-  **重點 : 不用管題目寫的左右**
+  **重點 : 題目out_both,out_any沒用滿 port [3:0]不用管題目寫的左右**
 
 ### Write your solution here
 ```verilog
