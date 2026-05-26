@@ -386,19 +386,13 @@ module top_module ( input [1:0] A, input [1:0] B, output z );
 endmodule
 
 ```
+
 ---
 
-## 🔴 Gatesv — 相鄰位元 both/any/different(卡超久)
+## Circuits - Combinational Logic - Basic Gates - Gates and Vectors
+<img width="1578" height="405" alt="image" src="https://github.com/user-attachments/assets/d14961f1-6960-47a3-a146-ae1c040cbf29" />
 
-**卡點**
-- 被題目「左鄰 / 右鄰」繞暈,左右是取同個 index 去看(i+1 還是 i-1)
-- 沒看清楚 **port 位寬**,自己宣告成 `[3:0]` 害後面要補東西繞彎
-- 誤以為 out_any 是「跟右邊所有位元」比(其實是「相鄰一個」)
-
-**頓悟點**
-- **本質就是「相鄰兩位做運算」**,「左/右」只是題目解釋的講法,程式碼一樣
-- out_different 唯一特殊:要**繞行**(最高位鄰居接回 in[0])
-- 三種解法(各 3 行,效果相同):
+```
 
   **① 切片(官方最簡潔,用縮減 port)**
   ```verilog
@@ -424,6 +418,17 @@ endmodule
   **重點**:
   - 不用管題目寫的左右
 
+### Write your solution here
+```verilog
+module top_module( 
+    input [3:0] in,
+    output [2:0] out_both,
+    output [3:1] out_any,
+    output [3:0] out_different );
+    assign out_both = in[3:1] & in[2:0];
+    assign out_any = in[3:1] | in[2:0];
+    assign out_different = in[3:0] ^ {in[0], in[3:1]};
+endmodule
 ---
 
 ## 🟡 Mux 9-to-1(16-bit,case + default)
