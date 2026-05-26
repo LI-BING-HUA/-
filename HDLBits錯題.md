@@ -67,7 +67,7 @@ endmodule
 
 ---
 
-## Verilog Language - Modules:Hierachy - Modules and Vectors
+## Verilog Language - Modules : Hierachy - Modules and Vectors
 <img width="1305" height="424" alt="image" src="https://github.com/user-attachments/assets/4de56fcf-d60b-40dc-a946-2614e8963d02" />
 
 - 看到 always → ` output reg [7:0] q`
@@ -100,7 +100,7 @@ endmodule
 
 ---
 
-## Verilog Language - Modules:Hierachy - Adder-subtractor
+## Verilog Language - Modules : Hierachy - Adder-subtractor
 <img width="759" height="487" alt="image" src="https://github.com/user-attachments/assets/46db646a-33fe-4ff9-83e0-ff0e2ae6f732" />
 
 `module add16 ( input[15:0] a, input[15:0] b, input cin, output[15:0] sum, output cout );`
@@ -214,12 +214,36 @@ endmodule
 ```
 ---
 
-## 🟡 Vector reversal (位元反向)
+## Verilog Language - More verilog features - Combinational for-loop : Vector reversal 
+<img width="605" height="50" alt="image" src="https://github.com/user-attachments/assets/ee586388-0ad8-40d3-a3d7-c5308dcf690e" />
 
-**頓悟點**
-- 短向量:`assign out = {in[0], in[1], ... in[7]};`(concatenation)
-- 長向量:generate for + `assign out[i] = in[N-1-i];`
-- 核心公式:`out[i] = in[N-1-i]`
+## 🔧 generate 通式
+
+### 基本架構
+
+```verilog
+genvar i;                            // ← genvar(不是 integer)
+
+generate
+    for (i = 0; i < N; i = i + 1) begin : 標籤名   // ← begin 後面要 : 標籤
+        // 要重複的東西(實例化、assign、邏輯閘)
+    end
+endgenerate
+```
+
+```verilog
+module top_module( 
+    input [99:0] in,
+    output [99:0] out
+);
+    genvar i;
+    generate
+        for (i = 0; i < 100; i = i + 1) begin : rev
+            assign out[i] = in[99 - i];
+        end
+    endgenerate
+endmodule
+```
 
 ---
 
