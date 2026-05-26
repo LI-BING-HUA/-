@@ -479,32 +479,72 @@ endmodule
 
 ---
 
-## 🔴 KMAP 卡諾圖化簡(連串題)
+## Circuits - Combinational Logic - Arithmetic - Signed addition overflow
+<img width="1521" height="74" alt="image" src="https://github.com/user-attachments/assets/58da8010-8902-4671-8c95-b3d4a5cf185f" />
 
-**卡點**
-- 不會圈大圈,只會列 minterm
-- 漏看大圈,化簡項數太多
-- **POS 的 maxterm 規則寫反**:把 SOP 規則套到 POS
+### Write your solution here
+```verilog
+module top_module (
+    input [7:0] a,
+    input [7:0] b,
+    output [7:0] s,
+    output overflow
+); //
+ 
+    assign s = a + b;
+    assign overflow = (a[7] == b[7]) && (s[7] != a[7]);
+endmodule
+```
 
-**頓悟點**
+---
+## Circuits - Combinational Logic - Arithmetic - Signed addition overflow
+<img width="1595" height="171" alt="image" src="https://github.com/user-attachments/assets/db842cf7-a60f-4be0-aba2-034e283e7698" />
 
-**SOP vs POS 規則完全相反**(背這個):
+### 💡 重點:SOP vs POS 規則完全相反
 
-| 形式 | 圈什麼 | 0 對應 | 1 對應 | 項內串接 | 項間串接 |
-|------|--------|--------|--------|---------|---------|
+| 形式 | 圈什麼 | 0 對應 | 1 對應 | 項內 | 項間 |
+|------|--------|--------|--------|------|------|
 | **SOP** | 圈 **1** | `~x` | `x` | `&` | `\|` |
 | **POS** | 圈 **0** | `x` | `~x` | `\|` | `&` |
 
-- **棋盤格 pattern = XOR**:1 和 0 交錯時,K-map 圈不出大塊,本質是 `a^b^c^d`(odd parity)
-- **don't care 全當 1 用**(SOP 時)幫助圈大圈
-- HDLBits **不要求最簡**,只檢查邏輯等價 → SOP 列所有 minterm 一定過,但式子長
-- 化簡步驟:先找 8 格 → 4 格 → 2 格 → 每個 1 至少被蓋一次,圈可重疊
-- **`assign out = a | ~(a | b | ~c)` 範例**:用 De Morgan 展開 = `a + b'c`,有時用 NOR 形式比直接化簡更簡
+### SOP 的精神
 
-**K-map Gray code 雷**:
-- 橫軸/縱軸是 **Gray code 順序 00, 01, 11, 10**(不是 binary)
-- **第 3 欄是 ab=11,第 4 欄是 ab=10** ⚠️
-- 從 K-map 抽欄對應到 mux 編號(binary 順序)時最容易混
+> **每個 minterm「點亮」一個位置**
+> 該位 = 1 才匹配 → 用 `|` 串,「只要任一個成立 → 1」
+
+### POS 的精神
+
+> **每個 maxterm「壓黑」一個位置**
+> 該位 = 0 才強制壓 0 → 用 `&` 串,「只要任一個 = 0 → 整體 = 0」
+
+### Write your solution here
+```verilog
+module top_module (
+    input  a, b, c, d,
+    output out_sop,
+    output out_pos
+);
+    // SOP:圈 1 的位置寫成 minterm,用 | 串
+    assign out_sop = (~a & ~b &  c &  d)
+                   | (~a &  b &  c &  d)
+                   | ( a &  b &  c &  d)
+                   | ( a & ~b &  c &  d)
+                   | (~a & ~b &  c & ~d);
+
+    // POS:圈 0 的位置寫成 maxterm,用 & 串
+    assign out_pos = ( a |  b |  c |  d)
+                   & ( a | ~b |  c |  d)
+                   & (~a | ~b |  c |  d)
+                   & (~a |  b |  c |  d)
+                   & ( a |  b |  c | ~d)
+                   & ( a | ~b |  c | ~d)
+                   & (~a | ~b |  c | ~d)
+                   & (~a |  b |  c | ~d)
+                   & ( a | ~b | ~c |  d)
+                   & (~a | ~b | ~c |  d)
+                   & (~a |  b | ~c |  d);
+endmodule
+```
 
 ---
 
