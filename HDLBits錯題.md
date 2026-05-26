@@ -645,10 +645,9 @@ endmodule
 
 ## Circuits - Sequemtial Logic - Latches and Flip-Flops - D Latch
 <img width="925" height="239" alt="image" src="https://github.com/user-attachments/assets/f88b882c-70ef-4a1b-af2c-308ea83164b1" />
-
-**沒 else 是故意的** → 產生 latch(這次是要的功能,不是 bug)
-Quartus 警告「latch inferred」是預期的,可無視
-平常組合邏輯沒 else = 不小心 latch(要避免);這題沒 else = 故意 latch(要的)
+- **沒 else 是故意的** → 產生 latch(這次是要的功能,不是 bug)
+- Quartus 警告「latch inferred」是預期的,可無視
+- 平常組合邏輯沒 else = 不小心 latch(要避免);這題沒 else = 故意 latch(要的)
 
 ```verilog
 module top_module (
