@@ -429,6 +429,7 @@ module top_module(
     assign out_any = in[3:1] | in[2:0];
     assign out_different = in[3:0] ^ {in[0], in[3:1]};
 endmodule
+```
 
 ---
 
