@@ -497,7 +497,8 @@ endmodule
 ```
 
 ---
-## Circuits - Combinational Logic - Arithmetic - Signed addition overflow
+
+## Circuits - Combinational Logic - Karnaugh Map to Circuit - Minimum SOP and POS
 <img width="1595" height="171" alt="image" src="https://github.com/user-attachments/assets/db842cf7-a60f-4be0-aba2-034e283e7698" />
 
 ### 💡 重點:SOP vs POS 規則完全相反
@@ -548,22 +549,41 @@ endmodule
 
 ---
 
-## 🔴 Karnaugh map → 4-to-1 mux 實作(不准用閘)
+## Circuits - Combinational Logic - Karnaugh Map to Circuit - K-map implemented with a multiplexer
+<img width="1579" height="799" alt="image" src="https://github.com/user-attachments/assets/cc3f1c07-8a25-4f35-aff4-9a416d83a092" />
 
-**卡點**
-- 不懂題目要幹嘛(外面 mux 給你,你要算 mux_in[0..3])
-- K-map 後兩欄 Gray code 看反(ab=11 vs ab=10)
-- 用 `~d` 當條件時,三元方向寫反
+```
+ab=00 → 走 mux_in[0]
+ab=01 → 走 mux_in[1]
+ab=10 → 走 mux_in[2]
+ab=11 → 走 mux_in[3]
+```
 
-**頓悟點**
-- **K-map 拆 4 欄,每欄是「ab 固定後 c,d 的子函數」**:
-  - mux_in[0] = ab=00 那欄的化簡(對應第 1 欄)
-  - mux_in[1] = ab=01 那欄(第 2 欄)
-  - mux_in[2] = ab=10 那欄(**第 4 欄!Gray code**)
-  - mux_in[3] = ab=11 那欄(**第 3 欄!Gray code**)
-- **三元運算子 `? :` 算 2-to-1 mux**,不算邏輯閘 → 題目限制下合法
-- `~d ? 0 : c` ≡ `d ? c : 0`(等價,兩個都是 `c & d`)
-- 同一邏輯**用 d? 或 ~d? 兩種角度寫,結果一樣**
+### 核心步驟:K-map 拆 4 欄
+
+把 K-map 按 **ab 欄拆開**,每欄對應一條 mux_in:
+
+| mux 編號(binary) | 對應 K-map 哪欄 |
+|------------------|----------------|
+| mux_in[0] (ab=00) | K-map 第 1 欄 |
+| mux_in[1] (ab=01) | K-map 第 2 欄 |
+| mux_in[2] (ab=10) | K-map **第 4 欄** ⚠️ |
+| mux_in[3] (ab=11) | K-map **第 3 欄** ⚠️ |
+每條 mux_in 是「**ab 固定後,只剩 c, d 的子函數**」。
+
+### Write your solution here
+```verilog
+module top_module (
+    input c,
+    input d,
+    output [3:0] mux_in
+); 
+    assign mux_in[0] = d ? 1 : c;
+    assign mux_in[1] = 0;
+    assign mux_in[2] = ~d ? 1 : 0;
+    assign mux_in[3] = ~d ? 0 : c;
+endmodule
+```
 
 ---
 
