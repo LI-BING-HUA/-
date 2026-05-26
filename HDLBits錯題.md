@@ -647,8 +647,8 @@ endmodule
 <img width="1558" height="199" alt="image" src="https://github.com/user-attachments/assets/9bd38fa1-7ac8-4c4c-b902-caf61884e45d" />
 
 - **byte enable**:每個 bit 控制一個位元組要不要更新
-  - `byteena[1]` 控制 d[15:8](上位元組)
-  - `byteena[0]` 控制 d[7:0](下位元組)
+  - `byteena[1]` 控制 d[15:8] (上位元組)
+  - `byteena[0]` 控制 d[7:0] (下位元組)
   - 該位=1 → 更新、=0 → 鎖住保持
 - 寫法用「**if 沒 else**」實現「開關關閉時保持」:
 
