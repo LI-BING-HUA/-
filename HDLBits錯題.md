@@ -437,38 +437,45 @@ endmodule
 
 ---
 
-## 🟡 Mux 9-to-1(16-bit,case + default)
+## Circuits - Combinational Logic - Multiplexers - 9-to-1 multiplexer
 
-**題目**:9 個 16-bit 輸入(a~i),sel 是 4-bit,選一個輸出到 16-bit 的 out。sel ≥ 9 時 out 全 1。
-
-**卡點**
-- 以為 `4'h0`~`4'h8` 是輸入位寬,其實是 **sel 的值**(sel 是 4-bit)
-- a, b, c, ..., i 不是 4-bit,**每一個都是 16-bit**(`input [15:0] a, b, c, ...` 是「每個都 16-bit」)
-- default 想寫全 1 寫成 `4{1}` → 錯
-  - `{N{x}}` 要**雙層大括號 + N 在外**:`{4{1'b1}}`
-  - 而且 out 是 16-bit,要重複 **16 次** 不是 4 次
-
-**頓悟點**
-- `4'h0` 是 sel 的值(sel 是 4-bit),跟 a~i 位寬無關
-- default 全 1 等價寫法:
+default 全 1 等價寫法:
   ```verilog
   out = {16{1'b1}};            // 重複運算子
   out = 16'hFFFF;              // hex 全 F
   out = 16'b1111_1111_1111_1111;  // 二進位寫死
   out = '1;                    // SystemVerilog 簡潔寫法:'1 = 全 1(自動填滿位寬)
   ```
-- default 全 0 等價寫法:
+default 全 0 等價寫法:
   ```verilog
   out = 16'b0;
   out = 16'h0;
   out = '0;                    // SystemVerilog 簡潔寫法:'0 = 全 0
   ```
-- **`'0` / `'1` 是 SystemVerilog 寫法**:
-  - `'0` = 全部填 0(自動配合 LHS 位寬)
-  - `'1` = 全部填 1(自動配合 LHS 位寬)
-  - 不用寫位寬,給 8-bit / 16-bit / 32-bit 都自動對齊
-  - 寫起來最簡潔,大型訊號特別好用
-- default 輸出什麼**是設計者決定**,不是「一定要 1111」——只要有 default 就不會 latch,題目要求全 1 才寫全 1
+**`'0` / `'1` 是 SystemVerilog 寫法**:
+
+### Write your solution here
+```verilog
+module top_module( 
+    input [15:0] a, b, c, d, e, f, g, h, i,
+    input [3:0] sel,
+    output reg [15:0] out );
+    always @(*) begin
+		case (sel)
+			4'h0: out = a;
+			4'h1: out = b;
+			4'h2: out = c;
+			4'h3: out = d;
+			4'h4: out = e;
+			4'h5: out = f;
+			4'h6: out = g;
+			4'h7: out = h;
+			4'h8: out = i;
+            default: out = {16{1'b1}};
+		endcase
+	end
+endmodule
+```
 
 ---
 
