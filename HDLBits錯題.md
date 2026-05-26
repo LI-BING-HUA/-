@@ -237,6 +237,13 @@ generate
     end
 endgenerate
 ```
+### 三個語法要點
+
+| 規則 | 為什麼 |
+|------|--------|
+| 用 `genvar` 不是 `integer` | generate 專用變數,合成時展開 |
+| 必須有 `begin : 標籤名` | 否則合成器不知道怎麼編號每個迭代 |
+| 用 `assign` 不是 `=` | 在 generate 區塊外(不在 always 裡) |
 
 ### Write your solution here
 ```verilog
