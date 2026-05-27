@@ -941,7 +941,7 @@ endmodule
 ## Circuits - Sequemtial Logic - Counters - Slow decade counter
 <img width="1586" height="319" alt="image" src="https://github.com/user-attachments/assets/dd229814-5403-4456-b56a-34b1e7b02e10" />
 
-### 🪜 4 階梯 SOP 對照
+### 🪜 4 階梯 SOP 對照(清、停、轉、跑)
 
 | 階梯 | 對應寫法 |
 |------|---------|
