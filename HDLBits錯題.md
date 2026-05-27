@@ -32,10 +32,12 @@
 ### Circuits - Sequential Logic
 - 🟡 Latches and Flip-Flops - DFF with reset value
 - 🟡 Latches and Flip-Flops - DFF with byte enable
-- 🔴 Latches and Flip-Flops - D Latch
-- 🔴 Latches and Flip-Flops - Detect both edges
-- 🔴 Latches and Flip-Flops - Edge capture register
-- 🔴 Latches and Flip-Flops - Dual-edge triggered flip-flop
+- 🟢Latches and Flip-Flops - D Latch
+- 🟡Latches and Flip-Flops - Detect both edges
+- 🔴Latches and Flip-Flops - Edge capture register
+- 🔴Latches and Flip-Flops - Dual-edge triggered flip-flop
+- 🟡Counters - Slow decade counter
+- 🔴Counters - Counter 1-12
 
 ### 附錄
 - 🔧 核心觀念整理(精簡版)
@@ -972,7 +974,7 @@ endmodule
 
 ---
 
-## Circuits - Sequemtial Logic - Counters -Counter 1-12
+## Circuits - Sequemtial Logic - Counters - Counter 1-12
 <img width="1575" height="796" alt="image" src="https://github.com/user-attachments/assets/451b935b-5b73-499d-9cb4-c89ccc625732" />
 
 ### 🎯 count4 的「3 種動作」(必懂!)
