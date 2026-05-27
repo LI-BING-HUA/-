@@ -33,6 +33,7 @@
 - 🟡 Latches and Flip-Flops - DFF with reset value
 - 🟡 Latches and Flip-Flops - DFF with byte enable
 - 🔴 Latches and Flip-Flops - D Latch
+- 🔴 Latches and Flip-Flops - Detect both edges
 
 ### 附錄
 - 🔧 核心觀念整理(精簡版)
