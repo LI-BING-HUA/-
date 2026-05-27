@@ -737,6 +737,51 @@ endmodule
 
 ---
 
+## Circuits - Sequemtial Logic - Latches and Flip-Flops - Detect both edges
+<img width="860" height="304" alt="image" src="https://github.com/user-attachments/assets/80c53bff-cc64-40fa-90eb-bd2f8de84b96" />
+
+## 邊緣偵測公式速查
+### 三種偵測方式
+| 偵測什麼 | 公式 |
+|---------|------|
+| 上升緣(0→1) | `in & ~in_prev` |
+| 下降緣(1→0) | `~in & in_prev` |
+| **任意邊緣**(值變了) | **`in ^ in_prev`** ⭐ |
+
+### 真值表(以 1-bit 為例)
+
+| in_prev | in | `in & ~in_prev` | `~in & in_prev` | `in ^ in_prev` |
+|---------|----|------------------|------------------|----------------|
+| 0 | 0 | 0 | 0 | 0 |
+| **0** | **1** | **1** ⭐ | 0 | **1** ⭐ |
+| **1** | **0** | 0 | **1** ⭐ | **1** ⭐ |
+| 1 | 1 | 0 | 0 | 0 |
+
+**`^`(XOR)= 「值變了」**——同時抓上升和下降緣
+
+### 應用
+
+- **按鈕觸發**:上升緣(按下那瞬間)
+- **訊號釋放**:下降緣(放開瞬間)
+- **狀態變化偵測**:任意邊緣(動了就觸發)
+
+```verilog
+module top_module (
+    input clk,
+    input [7:0] in,
+    output [7:0] anyedge
+);
+    reg [7:0] in_prev;
+    always @(posedge clk) begin
+    	in_prev <= in;
+        anyedge <= in ^ in_prev;
+    end
+endmodule
+
+```
+
+---
+
 ## Testbench 動態次數(repeat)
 
 | 寫法 | N 可變數? | 用途 |
