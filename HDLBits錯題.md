@@ -723,6 +723,7 @@ endmodule
 - Quartus 警告「latch inferred」是預期的,可無視
 - 平常組合邏輯沒 else = 不小心 latch(要避免);這題沒 else = 故意 latch(要的)
 
+### Write your solution here
 ```verilog
 module top_module (
     input d, 
@@ -765,6 +766,7 @@ endmodule
 - **訊號釋放**:下降緣(放開瞬間)
 - **狀態變化偵測**:任意邊緣(動了就觸發)
 
+### Write your solution here
 ```verilog
 module top_module (
     input clk,
