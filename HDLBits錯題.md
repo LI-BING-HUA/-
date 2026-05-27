@@ -35,6 +35,7 @@
 - 🔴 Latches and Flip-Flops - D Latch
 - 🔴 Latches and Flip-Flops - Detect both edges
 - 🔴 Latches and Flip-Flops - Edge capture register
+- 🔴 Latches and Flip-Flops - Dual-edge triggered flip-flop
 
 ### 附錄
 - 🔧 核心觀念整理(精簡版)
@@ -877,19 +878,6 @@ endmodule
 | **上升緣 + 記憶** | `out \| (in & ~in_prev)` |
 | **任意邊緣 + 記憶** | `out \| (in ^ in_prev)` |
 
-**Verilog 不支援同時 `@(posedge clk or negedge clk)` 的 FF**
-
-**兩個 always 各自抓一邊,XOR 合併輸出**
-```verilog
-// ❌ 大忌!q 被兩個 always 賦值 → multiple driver 錯誤
-always @(posedge clk) q <= d;
-always @(negedge clk) q <= d;     // ❌ 編譯錯
-```
-
-**Verilog 規則**:**一個變數只能在一個 always 區塊賦值**(否則 multiple driver)。
-
-#### ✅ 正解:**兩個各自的 reg + XOR 合併**
-
 ### Write your solution here
 ```verilog
 module top_module (
@@ -907,6 +895,42 @@ module top_module (
         else
             out <= out | (~in & in_prev);
     end
+endmodule
+```
+
+---
+
+## Circuits - Sequemtial Logic - Latches and Flip-Flops - Dual-edge triggered flip-flop
+<img width="1563" height="650" alt="image" src="https://github.com/user-attachments/assets/4544724d-42fb-402f-92aa-54a08a3b3836" />
+
+**Verilog 不支援同時 `@(posedge clk or negedge clk)` 的 FF**
+
+**兩個 always 各自抓一邊,XOR 合併輸出**
+```verilog
+// ❌ 大忌!q 被兩個 always 賦值 → multiple driver 錯誤
+always @(posedge clk) q <= d;
+always @(negedge clk) q <= d;     // ❌ 編譯錯
+```
+
+**Verilog 規則**:**一個變數只能在一個 always 區塊賦值**(否則 multiple driver)。
+
+#### ✅ 正解:**兩個各自的 reg + XOR 合併**
+
+### Write your solution here
+```verilog
+module top_module (
+    input clk,
+    input d,
+    output q
+);
+    reg q_neg, q_pos;
+    always @(posedge clk) begin
+    	q_pos <= d;
+    end
+    always @(negedge clk) begin
+    	q_neg <= d;
+    end
+    assign q = clk ? q_pos : q_neg;
 endmodule
 ```
 
