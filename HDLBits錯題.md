@@ -901,7 +901,7 @@ endmodule
 ---
 
 ## Circuits - Sequemtial Logic - Latches and Flip-Flops - Dual-edge triggered flip-flop
-<img width="1563" height="650" alt="image" src="https://github.com/user-attachments/assets/4544724d-42fb-402f-92aa-54a08a3b3836" />
+<img width="1562" height="331" alt="image" src="https://github.com/user-attachments/assets/0d5440d5-e609-4405-bef7-5e33024e7b0c" />
 
 **Verilog 不支援同時 `@(posedge clk or negedge clk)` 的 FF**
 
