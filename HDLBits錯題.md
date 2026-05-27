@@ -936,6 +936,87 @@ endmodule
 
 ---
 
+## Circuits - Sequemtial Logic - Counters - Slow decade counter
+<img width="1586" height="319" alt="image" src="https://github.com/user-attachments/assets/dd229814-5403-4456-b56a-34b1e7b02e10" />
+
+### 🪜 4 階梯 SOP 對照
+
+| 階梯 | 對應寫法 |
+|------|---------|
+| 1. **reset** | `if (reset) q <= 0` |
+| 2. **enable**(slowena) | `else if (slowena) ...`(slowena=0 跳過 → q 保持)|
+| 3. **邊界**(q==9) | `if (q == 9) q <= 0` |
+| 4. **正常** | `else q <= q + 1` |
+
+### Write your solution here
+```verilog
+module top_module (
+    input clk,
+    input slowena,
+    input reset,
+    output [3:0] q);
+    always @(posedge clk) begin
+        if (reset)
+			q <= 0;
+        else if (slowena) begin
+            if (q == 9)
+                q <= 0;
+            else
+            	q <= q + 1;
+        end
+        else
+            q <= q;
+    end
+endmodule
+```
+
+---
+
+## Circuits - Sequemtial Logic - Counters -Counter 1-12
+<img width="1575" height="796" alt="image" src="https://github.com/user-attachments/assets/451b935b-5b73-499d-9cb4-c89ccc625732" />
+
+### 🎯 count4 的「3 種動作」(必懂!)
+
+| load | enable | Q 動作 |
+|------|--------|--------|
+| **1** | 任何 | **Q ← d**(強制覆蓋,load 優先)|
+| 0 | **1** | **Q ← Q + 1**(count4 自己加 1)⭐ |
+| 0 | 0 | Q 保持 |
+
+**關鍵觀念**:
+- **+1 是 count4 自己做的事**,你不寫 +1 邏輯
+- **load = 「強制覆蓋」**,不是 +1!d 才是「覆蓋成什麼值」
+- **load 跟 +1 是互斥動作**,不會同時發生
+
+### Write your solution here
+```verilog
+module top_module (
+    input clk,
+    input reset,
+    input enable,
+    output [3:0] Q,
+    output c_enable,
+    output c_load,
+    output [3:0] c_d
+); 
+    assign c_enable = enable;                                // count4!現在准不准動?
+    assign c_load = reset || (Q == 4'd12 && enable == 1'b1); // count4!現在要不要強制塞 1 進去?
+    assign c_d = 4'd1;                                       // count4!要塞什麼值進去?
+    
+    count4 the_counter (
+        .clk    (clk),
+        .enable (c_enable),
+        .load   (c_load),
+        .d      (c_d),
+        .Q      (Q)
+    );
+
+endmodule
+
+```
+
+---
+
 ## Testbench 動態次數(repeat)
 
 | 寫法 | N 可變數? | 用途 |
