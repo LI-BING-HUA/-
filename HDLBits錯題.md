@@ -835,25 +835,6 @@ endmodule
 ## Circuits - Sequemtial Logic - Latches and Flip-Flops - Edge capture register
 <img width="1563" height="650" alt="image" src="https://github.com/user-attachments/assets/4544724d-42fb-402f-92aa-54a08a3b3836" />
 
-每個位元獨立做:
-- **in 從 1→0(下降緣)** → out 對應位變 1
-- **out 變 1 後維持**(不會自己變 0)
-- **reset=1(同步)** → out 全清 0
-- **reset 優先**
-
-### 💡 核心公式拆解
-
-**`out <= out | (~in & in_prev)`** 拆兩部分:
-
-| 部分 | 作用 |
-|------|------|
-| **`~in & in_prev`** | 找出「**這 cycle 剛剛 1→0** 的位」(下降緣偵測) |
-| **`out \|`** | **OR 累積**:已經亮的繼續亮 + 新亮的加入 |
-
-**OR 累積特性**:
-- `out | 0 = out`(沒事 → 保持原值)
-- `out | X`,X 有 1 的位 → 累積進去(只進不退)
-
 ### 📋 規則對照(4 種情況)
 
 | 情況 | reset | in 變化 | 公式行為 | out 結果 |
@@ -862,33 +843,6 @@ endmodule
 | B | 0 | 1→0(下降緣) | `~in & in_prev` 該位 = 1,OR 累積 | 那位變 1 |
 | C | 0 | 0→1(上升緣) | `~in & in_prev = 0`,OR 0 不影響 | 維持 |
 | D | 0 | 沒變 | `~in & in_prev = 0`,OR 0 不影響 | 維持 |
-
-**3 種情況用一條公式同時滿足 → 不需要 if-else 處理每位**
-
-### 🧭 逐 cycle trace 範例(從規則推 → 不套公式)
-
-時間軸:
-```
-cycle:  1  2  3  4  5  6  7  8  9  10  11  12  13
-reset:  1  0  0  0  0  0  0  0  0  0   1   0   0
-in:     0  2  2  2  2  e  e  0  0  2   2   2   0
-```
-
-| cycle | reset | in | 上 cycle in | 1→0 的位 | out |
-|-------|-------|-----|------------|---------|-----|
-| 1 | 1 | 0 | - | - | **0**(reset) |
-| 2 | 0 | 2 | 0 | 無(上升) | 0 |
-| 3~5 | 0 | 2 | 2 | 無 | 0 |
-| 6 | 0 | e | 2 | 無(2→e 是上升) | 0 |
-| 7 | 0 | e | e | 無 | 0 |
-| **8** | 0 | **0** | **e** | **bit 1,2,3** ⭐ | **e** |
-| 9 | 0 | 0 | 0 | 無 | e |
-| 10 | 0 | 2 | 0 | 無(上升) | e |
-| **11** | **1** | 2 | 2 | - | **0**(reset) |
-| 12 | 0 | 2 | 2 | 無 | 0 |
-| **13** | 0 | **0** | **2** | **bit 1** ⭐ | **2** |
-
-對照圖:**0 → e → 0 → 2** ✅
 
 ### 🎯 從 0 推答案的 SOP(5 步驟)
 
@@ -901,18 +855,6 @@ in:     0  2  2  2  2  e  e  0  0  2   2   2   0
    - 每 cycle 都「舊燈不熄 + 新燈加入」→ `out |`
    - reset 直接清 0,跳過其他邏輯 → `if-else`
 5. **翻譯成 Verilog**
-
-**核心**:從規則一輪一輪推,公式自己浮出來——**不是「想答案」,是「手動跑、找規律」**
-
-### ⚠️ 易踩雷
-
-| 雷 | 解 |
-|----|----|
-| `out <= ~in & in_prev`(沒 OR) | 變成 1 cycle 脈衝,無法維持 |
-| reset 寫在敏感列表 `or posedge reset` | 變非同步 reset(題目要同步) |
-| `if (~reset)` | reset 是 active-high,不要反相 |
-| 忘了 `output reg` | always 賦值要 reg |
-| 忘了 `in_prev <= in` | 沒有「上 cycle 的記憶」,無法比較變化 |
 
 ### 💡 應用場景
 
@@ -934,6 +876,19 @@ in:     0  2  2  2  2  e  e  0  0  2   2   2   0
 | **下降緣 + 記憶**(這題) | **`out \| (~in & in_prev)`** |
 | **上升緣 + 記憶** | `out \| (in & ~in_prev)` |
 | **任意邊緣 + 記憶** | `out \| (in ^ in_prev)` |
+
+**Verilog 不支援同時 `@(posedge clk or negedge clk)` 的 FF**
+
+**兩個 always 各自抓一邊,XOR 合併輸出**
+```verilog
+// ❌ 大忌!q 被兩個 always 賦值 → multiple driver 錯誤
+always @(posedge clk) q <= d;
+always @(negedge clk) q <= d;     // ❌ 編譯錯
+```
+
+**Verilog 規則**:**一個變數只能在一個 always 區塊賦值**(否則 multiple driver)。
+
+#### ✅ 正解:**兩個各自的 reg + XOR 合併**
 
 ### Write your solution here
 ```verilog
