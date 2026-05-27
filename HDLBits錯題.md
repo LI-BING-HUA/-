@@ -520,6 +520,52 @@ endmodule
 ## Circuits - Combinational Logic - Arithmetic - Signed addition overflow
 <img width="1521" height="74" alt="image" src="https://github.com/user-attachments/assets/58da8010-8902-4671-8c95-b3d4a5cf185f" />
 
+## 🔧 二補數還原公式
+
+### 核心公式
+
+```
+signed = unsigned − 2^N    (當 MSB = 1 時)
+```
+
+- **N** = 位寬(幾 bit)
+- **2^N** = 該位寬的總範圍大小
+- **MSB = 1 才需要減**(=0 時 signed 跟 unsigned 一樣)
+
+### 不同位寬對照
+
+| 位寬 | 2^N | signed 範圍 |
+|------|-----|-------------|
+| 4-bit | 16 | −8 ~ +7 |
+| 8-bit | **256** | −128 ~ +127 |
+| 16-bit | 65536 | −32768 ~ +32767 |
+| 32-bit | 2^32 | ±2^31 |
+
+### 快速判正負(看 hex 第一字)
+
+| Hex 第一字 | Binary 開頭 | 正負 |
+|-----------|------------|------|
+| 0~7 | `0xxx` | **正數** ✅ |
+| 8~F | `1xxx` | **負數** ⚠️ |
+
+### 範例(8-bit)
+
+| hex | unsigned | signed | 計算 |
+|------|----------|--------|------|
+| `8'h00` | 0 | 0 | MSB=0,直接讀 |
+| `8'h7F` | 127 | +127 | MSB=0,直接讀 |
+| `8'h80` | 128 | **−128** | 128 − 256 |
+| `8'h90` | 144 | **−112** | 144 − 256 |
+| `8'hFF` | 255 | **−1** | 255 − 256 |
+
+### 💡 黃金口訣
+
+> **全 1 = −1**(任何位寬都成立!)
+> - `4'b1111` = −1
+> - `8'hFF` = −1
+> - `16'hFFFF` = −1
+> - `32'hFFFFFFFF` = −1
+
 ### Write your solution here
 ```verilog
 module top_module (
