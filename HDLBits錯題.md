@@ -1339,7 +1339,7 @@ endmodule
 ```verilog
 assign Z = Q[{A, B, C}];   // 用拼接的值當 index
 ```
-- `{A,B,C}` 拼成 3'bxxx 3-bit 數(0~7), 且當你拿一串 bit 當索引用,Verilog 只會把它當二進位整數解讀。
+- `{A,B,C}` 拼成 3'bxxx 3-bit 數(0~7), 且當你拿一串 bit 當索引用,Verilog 只會把它當二進位整數解讀
 - `Q[...]` 用那個數當索引 → **合成出來就是 8-to-1 mux**
 - 一行頂八行 case
 
