@@ -38,6 +38,13 @@
 - 🔴Latches and Flip-Flops - Dual-edge triggered flip-flop
 - 🟡Counters - Slow decade counter
 - 🔴Counters - Counter 1-12
+- 🔴Counters - Counter 1000
+- 🔴Counters - 4-digit decimal counter
+- 🟡Counters - 12-hour clock
+- 🔴Shift Registers - Left/right arithmetic shift by 1 or 8
+- 🟡Shift Registers - shift register 1
+- 🟡Shift Registers - shift register 2
+- 🟢Shift Registers - 3-input LUT
 
 ### 附錄
 - 🔧 核心觀念整理(精簡版)
@@ -1014,7 +1021,347 @@ module top_module (
     );
 
 endmodule
+```
 
+---
+
+## Circuits - Sequemtial Logic - Counters - Counter 1000(BCD 1000Hz → 1Hz 分頻器)
+<img width="1581" height="497" alt="image" src="https://github.com/user-attachments/assets/0cec9557-8228-4c39-b17a-9224b1fc6a62" />
+
+### 觀念:用三個 mod-10 計數器串成 mod-1000
+- 1000 = 10 × 10 × 10,所以串三個「數 0~9」的 BCD 計數器
+- 注意 wire bit 數
+
+### 進位邏輯(這個要背)
+```verilog
+c_enable[0] = 1'b1;                                             // 最快那個永遠 enable
+c_enable[1] = (c0 == 4'd9);                                     // 個位滿 9
+c_enable[2] = (c0 == 4'd9) && (c1 == 4'd9);                     // 個十都滿
+OneHertz    = (c0 == 4'd9) && (c1 == 4'd9) && (c2 == 4'd9 );    // 千位輸出
+```
+
+### Write your solution here
+```verilog
+module top_module (
+    input clk,
+    input reset,
+    output OneHertz,
+    output [2:0] c_enable
+); 
+    wire [3:0] c0, c1, c2;
+	assign c_enable[0] = 1'b1;
+	assign c_enable[1] = (c0 == 4'd9);
+	assign c_enable[2] = (c0 == 4'd9) && (c1 == 4'd9);
+	assign OneHertz    = (c0 == 4'd9) && (c1 == 4'd9) && (c2 == 4'd9 );
+    
+    bcdcount counter0 (clk, reset, c_enable[0], c0);
+    bcdcount counter1 (clk, reset, c_enable[1], c1);
+    bcdcount counter2 (clk, reset, c_enable[2], c2);
+endmodule
+```
+
+---
+
+## Circuits - Sequemtial Logic - Counters - 4-digit decimal counter
+<img width="1549" height="381" alt="image" src="https://github.com/user-attachments/assets/055e0bb9-df87-4ca3-b4cd-800eb3310a72" />
+
+### 觀念:四個 BCD 串接(個、十、百、千位)
+- ena[1]、ena[2]、ena[3] 是進位 enable(沒有 ena[0],個位永遠數)
+- 子模組需要 enable port,沒有就要自己加
+
+### 我踩的雷
+- ❌ 子模組沒 enable port,沒辦法控制「只在下面滿時動」
+- ❌ output 沒加 reg,被 always 賦值就會報錯
+- ❌ 想用 q_ 同時自己數又用子模組 → 又是 multiple drivers
+
+### Write your solution here
+```verilog
+module top_module (
+    input clk,
+    input reset,   // Synchronous active-high reset
+    output reg [3:1] ena,
+    output reg [15:0] q);
+
+    assign ena[1] = (q[3:0] == 4'd9);
+    assign ena[2] = (q[3:0] == 4'd9) && (q[7:4] == 4'd9);
+    assign ena[3] = (q[3:0] == 4'd9) && (q[7:4] == 4'd9) && (q[11:8] == 4'd9);
+    
+    Countbcd u1(.clk(clk), .reset(reset), .enable(1'b1), .q(q[3:0]));
+    Countbcd u2(.clk(clk), .reset(reset), .enable(ena[1]), .q(q[7:4]));
+    Countbcd u3(.clk(clk), .reset(reset), .enable(ena[2]), .q(q[11:8]));
+    Countbcd u4(.clk(clk), .reset(reset), .enable(ena[3]), .q(q[15:12]));
+endmodule
+
+module Countbcd (
+    input clk,
+    input reset,        // Synchronous active-high reset
+    input enable,
+    output reg [3:0] q);
+    always @(posedge clk) begin
+        if (reset)
+            q <= 4'b0;
+        else if (enable) begin
+            if (q == 4'd9)
+                q <= 1'b0;
+            else
+                q <= q + 1'b1;
+        end
+    end
+endmodule
+```
+
+---
+
+## Circuits - Sequemtial Logic - Counters - 4-digit decimal counter
+<img width="1568" height="551" alt="image" src="https://github.com/user-attachments/assets/3dc2df08-4c4d-495f-9d42-7796f78bd08f" />
+
+### 觀念:這是 BCD,不是二進位!
+- BCD = 每 4 bit 代表一個十進位數字,只准用 0~9
+- 顯示 12 點要寫 `8'h12`,**不能寫 `8'd12`(那是 0c)**
+- bit pattern「分兩半看」是題目指定
+
+### BCD 的進位寫法
+```verilog
+// 個位滿 9 要進位歸零,不能直接 +1(會變 a)
+(v[3:0] == 4'h9) ? {v[7:4]+4'h1, 4'h0} : v + 8'h1
+```
+
+### 時鐘的轉折點(全部要 if 攔截)
+| 值     | 為什麼特殊       | 行為                    |
+|--------|----------------|------------------------|
+| 個位 9 | BCD 規則        | 進位歸零               |
+| 59     | 滿了            | 進到上一層              |
+| 11     | 12 小時制       | 變 12,翻 pm           |
+| 12     | 12 小時制       | 變 1(不是 13)         |
+
+### 我踩的雷
+- ❌ 用 `8'd12` 想表示 12 點 → 實際是 `8'h0c`,顯示變成 c
+- ❌ 直接 `ss + 8'd1` → 個位 9 變 a(BCD 不允許 a~f)
+- ❌ 最後 `else` 沒加 ena → ena=0 時時鐘還在走(不會停)
+- ❌ output 沒加 reg
+- ❌ 以為 `'h59` 換十進位是 89,糾結很久(其實是約定問題,看法不同)
+
+### 關鍵心法
+- **BCD 一律用 `'h` 寫**(`8'h59` 一看就是 5 和 9)
+- **每個分支都要擋 ena**(最後的 else 容易漏)
+- 「分兩半看」是題目指定 BCD
+- always 沒賦值 → register 自動 hold(這就是「暫停」的原理)
+
+### Write your solution here
+```verilog
+module top_module(
+    input clk,
+    input reset,
+    input ena,
+    output pm,
+    output [7:0] hh,
+    output [7:0] mm,
+    output [7:0] ss); 
+    
+    always @(posedge clk) begin
+        if (reset) begin
+            pm <= 1'b0;
+            hh <= 8'h12;
+            mm <= 8'h0;
+            ss <= 8'h0;
+        end
+        else if (ena && hh == 8'h11 && mm == 8'h59 && ss == 8'h59) begin
+            pm <= ~pm;
+        	hh <= 8'h12;
+            mm <= 8'h0;
+            ss <= 8'h0;
+        end
+        else if (ena && hh == 8'h12 && mm == 8'h59 && ss == 8'h59) begin
+            hh <= 8'h1;
+            mm <= 8'h0;
+            ss <= 8'h0;
+        end
+        else if (ena && mm == 8'h59 && ss == 8'h59) begin
+            hh <= (hh[3:0]==4'h9) ? {hh[7:4]+4'h1,4'h0} : hh+8'h1;
+            mm <= 8'h0;
+            ss <= 8'h0;
+        end
+        else if (ena && ss == 8'h59) begin
+            mm <= (mm[3:0]==4'h9) ? {mm[7:4]+4'h1,4'h0} : mm+8'h1;
+            ss <= 8'h0;
+        end
+        else if (ena)
+            ss <= (ss[3:0]==4'h9) ? {ss[7:4]+4'h1,4'h0} : ss+8'h1;  
+    end
+endmodule
+```
+
+---
+
+## Circuits - Sequemtial Logic - Shift Registers - Left/right arithmetic shift by 1 or 8
+<img width="1572" height="565" alt="image" src="https://github.com/user-attachments/assets/4dc3fe9c-120f-42c3-b572-1ee451035637" />
+
+### 觀念:算術右移要補符號位,不補 0
+- `>>>` 算術右移(補符號位)、`>>` 邏輯右移(補 0)
+- **但是!** `>>>` 只有對 `signed` 變數才會補符號位
+
+### 我踩的雷
+- ❌ q 沒宣告成 signed,用 `>>>` 還是補 0 → 算術右移失效
+- ❌ 以為 `>>>` 自動會補符號位
+
+### 兩種修法
+```verilog
+// 方法 A:宣告 signed
+output reg signed [63:0] q;
+q <= q >>> 1;
+
+// 方法 B:手動拼接補符號位(更穩)
+q <= {q[63], q[63:1]};            // 右移 1,補 1 個 q[63]
+q <= {{8{q[63]}}, q[63:8]};       // 右移 8,補 8 個 q[63]
+```
+
+### 關鍵心法
+- 移位運算子整理:
+  | 運算子 | 行為              | 何時用                |
+  |--------|------------------|----------------------|
+  | `>>`   | 補 0              | 邏輯右移              |
+  | `>>>`  | 補符號位(需 signed)| 算術右移(有號除法)  |
+  | `<<`   | 補 0              | 左移(邏輯/算術一樣)  |
+  | `{}`   | 補你指定的東西    | 萬能,但移動量必須是常數    |
+
+- **「能不能補非 0」要看 signed 宣告**,光靠 `>>>` 不夠
+- 拼接 `{}` 是最保險的萬用解,但動量必須是常數
+
+### Write your solution here
+```verilog
+module top_module(
+    input clk,
+    input load,
+    input ena,
+    input [1:0] amount,
+    input [63:0] data,
+    output reg signed [63:0] q); 
+    always @(posedge clk) begin
+        if (load)
+            q <= data;
+        else if(ena)
+            case(amount)
+            	2'b00: q <= q <<< 1;
+                2'b01: q <= q <<< 8;
+                2'b10: q <= q >>> 1; // q <= {q[63], q[63:1]}
+                2'b11: q <= q >>> 8; // q <= {{8{q[63]}}, q[63:8]}
+            endcase
+    end
+endmodule
+```
+
+---
+
+## Circuits - Sequemtial Logic - Shift Registers - shift register 1
+<img width="874" height="333" alt="image" src="https://github.com/user-attachments/assets/29a090ee-d360-4103-85b2-b7ff205f4b9d" />
+
+### 觀念:reset 有個圈圈 → active-low
+- 圖上 FF 的 R 接腳前面有**小圓圈** → 代表 **0 才 reset**
+- 訊號名稱 `resetn` 的「n」也是提示(negative-true)
+
+### 我踩的雷
+- ❌ 看到 reset 就反射寫 `if (resetn) q <= 0;` → 邏輯反了
+- ✅ 應該寫 `if (!resetn) q <= 0;` 或 `if (resetn == 0)`
+
+### 關鍵心法
+- **圖上看到圈圈 = 反向 = active-low**,寫 code 要加 `!`
+- 訊號名稱含 `n`、`_n`、`_b` 通常都是 active-low
+- 看波形時也要注意:有些訊號平常是 1、變 0 才作用
+
+### Write your solution here
+```verilog
+module top_module (
+    input clk,
+    input resetn,   // synchronous reset
+    input in,
+    output out);
+    reg w1, w2, w3;
+    always @(posedge clk)begin
+        if (~resetn) begin
+            w1  <= 0;
+        	w2  <= 0;
+        	w3  <= 0;
+        	out <= 0;
+        end
+        else begin
+            w1  <= in;
+        	w2  <= w1;
+       		w3  <= w2;
+        	out <= w3;
+        end
+    end
+endmodule
+```
+
+---
+
+## Circuits - Sequemtial Logic - Shift Registers - shift register 2
+<img width="1562" height="953" alt="image" src="https://github.com/user-attachments/assets/e3961c41-436c-4ff5-b2d6-0aa64b082246" />
+
+### 我踩的雷
+- ❌ **順序看反了**:w 餵給 m0、Q[0] 在最左邊
+- ✅ 實際是:**w 進到 m_{n-1}(最高位 Q_{n-1})**,往下移到 Q_0
+
+### Write your solution here
+```verilog
+module top_module (
+    input [3:0] SW,
+    input [3:0] KEY,
+    output [3:0] LEDR
+); 
+    MUXDFF m0(.clk(KEY[0]), .w(KEY[3]), .R(SW[3]), .E(KEY[1]), .L(KEY[2]), .Q(LEDR[3]));
+    MUXDFF m1(.clk(KEY[0]), .w(LEDR[3]), .R(SW[2]), .E(KEY[1]), .L(KEY[2]), .Q(LEDR[2]));
+    MUXDFF m2(.clk(KEY[0]), .w(LEDR[2]), .R(SW[1]), .E(KEY[1]), .L(KEY[2]), .Q(LEDR[1]));
+    MUXDFF m3(.clk(KEY[0]), .w(LEDR[1]), .R(SW[0]), .E(KEY[1]), .L(KEY[2]), .Q(LEDR[0]));
+    
+endmodule
+
+module MUXDFF (
+    input clk,
+    input w, R, E, L,
+    output reg Q
+);
+    wire w1, w2;
+    assign w1 = E ? w : Q;
+    assign w2 = L ? R : w1;
+    always @(posedge clk) begin
+		Q <= w2;
+    end
+endmodule
+```
+
+---
+
+## Circuits - Sequemtial Logic - Shift Registers - 3-input LUT
+<img width="1568" height="242" alt="image" src="https://github.com/user-attachments/assets/f075f162-d06d-4d99-8b7c-386a3c4ba332" />
+
+### 經典技巧
+```verilog
+assign Z = Q[{A, B, C}];   // 用拼接的值當 index
+```
+- `{A,B,C}` 拼成 3-bit 數(0~7)
+- `Q[...]` 用那個數當索引 → **合成出來就是 8-to-1 mux**
+- 一行頂八行 case
+
+### Write your solution here
+```verilog
+module top_module (
+    input clk,
+    input enable,
+    input S,
+    input A, B, C,
+    output Z ); 
+    
+    reg [7:0] Q;
+    
+    always @(posedge clk) begin
+    	if (enable)
+            Q <= {Q[6:0], S};
+        else
+            Q <= Q;
+    end
+    assign Z = Q[{A, B, C}];
+endmodule
 ```
 
 ---
