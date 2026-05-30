@@ -45,6 +45,8 @@
 - 🟡Shift Registers - shift register 1
 - 🟡Shift Registers - shift register 2
 - 🟢Shift Registers - 3-input LUT
+- 🟢More Circuits - Rule 90
+- 🔴More Circuits - Rule 110
 
 ### 附錄
 - 🔧 核心觀念整理(精簡版)
@@ -1361,6 +1363,155 @@ module top_module (
             Q <= Q;
     end
     assign Z = Q[{A, B, C}];
+endmodule
+```
+
+---
+
+## Circuits - Sequemtial Logic - More Circuits - Rule 90
+<img width="1570" height="718" alt="image" src="https://github.com/user-attachments/assets/5df66462-e717-40e6-8fb3-45def603eb60" />
+
+**每個 clock = 一個時間步（圖上的一「列」）。**
+
+```
+時間 ↓ (clock 推，直向)        橫向 (for 跑每一格)
+t=0   1                        ──────────────►
+t=1   10                       clock 管「第幾列」
+t=2   101                      for   管「一列裡每一格」
+t=3   1000
+```
+
+## load 的角色（≈ 可指定載入值的 reset）
+ 
+- `load` 是**輸入訊號**，值由 testbench 餵進來，你的 code 不能也不需要知道它是幾。
+- 只要做到：**load=1 的那拍，把當下的 data 搬進 q**。
+- `load` **每個 clock 都要判斷**，不是只在開頭觸發一次——它隨時可能再被拉高，要求重新載入。
+
+### Write your solution here
+```verilog
+module top_module(
+    input clk,
+    input load,
+    input [511:0] data,
+    output reg [511:0] q ); 
+    
+    integer i;
+
+    always @(posedge clk) begin
+        if (load)
+            q <= data;
+        else begin
+            for (i = 0; i < 512; i = i + 1) begin
+                if (i == 0)
+                    q[i] <= q[i + 1] ^ 1'b0;
+                else if (i == 511)
+                    q[i] <= 1'b0 ^ q[i - 1];
+                else
+                    q[i] <= q[i + 1] ^ q[i - 1];
+            end
+        end
+    end
+endmodule
+```
+### Rule 90（移位版，最簡潔）
+```verilog
+module top_module(
+    input clk,
+    input load,
+    input [511:0] data,
+    output reg [511:0] q
+);
+    always @(posedge clk) begin
+        if (load)
+            q <= data;
+        else
+            q <= {1'b0, q[511:1]} ^ {q[510:0], 1'b0};  // 左鄰 XOR 右鄰
+    end
+endmodule
+```
+
+---
+
+## Circuits - Sequemtial Logic - More Circuits - Rule 110
+<img width="1562" height="647" alt="image" src="https://github.com/user-attachments/assets/345116dd-0d17-46af-9c52-28e6941c9865" />
+
+→ 化簡：`next = (中 | 右) & ~(左 & 中 & 右)`
+
+```verilog
+// 左鄰居：整條往「右」移一格，最高位補 0（補的 0 = 邊界 q[512]=0）
+{1'b0, q[511:1]}
+ 
+// 右鄰居：整條往「左」移一格，最低位補 0（補的 0 = 邊界 q[-1]=0）
+{q[510:0], 1'b0}
+```
+
+### Write your solution here
+```verilog
+module top_module(
+    input clk,
+    input load,
+    input [511:0] data,
+    output reg [511:0] q
+);
+    wire [511:0] L = {1'b0, q[511:1]};   // 左鄰
+    wire [511:0] C = q;                   // 中
+    wire [511:0] R = {q[510:0], 1'b0};   // 右鄰
+
+    always @(posedge clk) begin
+        if (load)
+            q <= data;
+        else
+            // 直接把 5 個 next=1 的情況 OR 起來,完全照真值表
+            q <= ( L & C & ~R)   // 110
+               | ( L & ~C & R)   // 101
+               | (~L & C & R)    // 011
+               | (~L & C & ~R)   // 010
+               | (~L & ~C & R);  // 001
+    end
+endmodule
+```
+
+### Rule 110（移位版）
+```verilog
+module top_module(
+    input clk,
+    input load,
+    input [511:0] data,
+    output reg [511:0] q
+);
+    wire [511:0] L = {1'b0, q[511:1]};   // 左鄰
+    wire [511:0] C = q;                   // 中
+    wire [511:0] R = {q[510:0], 1'b0};    // 右鄰
+    always @(posedge clk) begin
+        if (load) q <= data;
+        else      q <= (C | R) & ~(L & C & R);
+    end
+endmodule
+```
+
+### for 迴圈版（逐格寫，好對照真值表）
+```verilog
+module top_module(
+    input clk,
+    input load,
+    input [511:0] data,
+    output reg [511:0] q
+);
+    integer i;
+    reg L, C, R;
+    always @(posedge clk) begin
+        if (load) q <= data;
+        else begin
+            for (i = 0; i < 512; i = i + 1) begin
+                C = q[i];
+                L = (i == 511) ? 1'b0 : q[i+1];  // 左鄰，邊界補 0
+                R = (i == 0)   ? 1'b0 : q[i-1];  // 右鄰，邊界補 0
+                // Rule 90:  q[i] <= L ^ R;
+                // Rule 110: q[i] <= (C | R) & ~(L & C & R);
+                q[i] <= (C | R) & ~(L & C & R);
+            end
+        end
+    end
 endmodule
 ```
 
