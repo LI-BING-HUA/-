@@ -1413,6 +1413,7 @@ module top_module(
     end
 endmodule
 ```
+
 ### Rule 90（移位版，最簡潔）
 ```verilog
 module top_module(
@@ -1426,6 +1427,31 @@ module top_module(
             q <= data;
         else
             q <= {1'b0, q[511:1]} ^ {q[510:0], 1'b0};  // 左鄰 XOR 右鄰
+    end
+endmodule
+```
+
+# Rule 90 — 未化簡 SOP 版 Verilog
+ 
+```verilog
+module top_module(
+    input clk,
+    input load,
+    input [511:0] data,
+    output reg [511:0] q
+);
+    wire [511:0] L = {1'b0, q[511:1]};   // 左鄰
+    wire [511:0] C = q;                   // 中
+    wire [511:0] R = {q[510:0], 1'b0};   // 右鄰
+    always @(posedge clk) begin
+        if (load)
+            q <= data;
+        else
+            // 未化簡 SOP：把 4 個 next=1 的 minterm OR 起來（含 C）
+            q <= (~L & ~C &  R)    // 001
+               | (~L &  C &  R)    // 011
+               | ( L & ~C & ~R)    // 100
+               | ( L &  C & ~R);   // 110
     end
 endmodule
 ```
@@ -1485,32 +1511,6 @@ module top_module(
     always @(posedge clk) begin
         if (load) q <= data;
         else      q <= (C | R) & ~(L & C & R);
-    end
-endmodule
-```
-
-### for 迴圈版（逐格寫，好對照真值表）
-```verilog
-module top_module(
-    input clk,
-    input load,
-    input [511:0] data,
-    output reg [511:0] q
-);
-    integer i;
-    reg L, C, R;
-    always @(posedge clk) begin
-        if (load) q <= data;
-        else begin
-            for (i = 0; i < 512; i = i + 1) begin
-                C = q[i];
-                L = (i == 511) ? 1'b0 : q[i+1];  // 左鄰，邊界補 0
-                R = (i == 0)   ? 1'b0 : q[i-1];  // 右鄰，邊界補 0
-                // Rule 90:  q[i] <= L ^ R;
-                // Rule 110: q[i] <= (C | R) & ~(L & C & R);
-                q[i] <= (C | R) & ~(L & C & R);
-            end
-        end
     end
 endmodule
 ```
