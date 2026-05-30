@@ -1431,7 +1431,7 @@ module top_module(
 endmodule
 ```
 
-# Rule 90 — 未化簡 SOP 版 Verilog
+### Rule 90 — 未化簡 SOP 版 Verilog
  
 ```verilog
 module top_module(
