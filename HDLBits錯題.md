@@ -1536,6 +1536,41 @@ endmodule
 > 重點：題目給 `A=4'b0001, B=4'b0010, C=4'b0100, D=4'b1000` 這組值，
 > **只有 case 寫法才真的用到**。逐位讀寫法只取「1 在第幾位」（→ 索引），值本身用不到。
 
+### 比較表
+ 
+| 項目 | `parameter` | `localparam` |
+|---|---|---|
+| 能否被外部覆寫 | ✅ 可以（實例化時 `#(.X(..))`） | ❌ 不行，鎖死 |
+| 設計用途 | 模組的**可配置參數** | 模組的**內部固定常數** |
+| 典型例子 | 資料寬度、計數上限、FIFO 深度 | FSM 狀態編碼、算出來的常數 |
+| FSM 狀態編碼該用嗎 | 可用但語意不精確 | ✅ 推薦 |
+| HDLBits 能不能過 | ✅ 能過（單模組無覆寫場景） | ✅ 能過 |
+
+### 用途對照
+ 
+| 用途 | 該用 | 理由 |
+|---|---|---|
+| 狀態編碼 A/B/C/D | `localparam` | 內部細節，不該被外部亂改 |
+| 資料寬度 WIDTH、計數上限 | `parameter` | 設計來給外部調 |
+| 純算出來的固定常數 | `localparam` | 鎖死防誤改 |
+
+### parameter（可被外部覆寫）
+```verilog
+module counter #(parameter WIDTH = 8) (...);
+    // WIDTH 可在實例化時改
+endmodule
+ 
+counter #(.WIDTH(16)) u1 (...);   // 外部把 WIDTH 改成 16
+```
+ 
+### localparam（內部鎖死，FSM 狀態用這個）
+```verilog
+module top_module(...);
+    localparam A=0, B=1, C=2, D=3;   // 純內部常數，外面動不了
+    ...
+endmodule
+```
+
 ### Write your solution here
 ```verilog
 module top_module(
