@@ -47,7 +47,7 @@
 - 🟢Shift Registers - 3-input LUT
 - 🟢More Circuits - Rule 90
 - 🔴More Circuits - Rule 110
-- Finate State Machines - Simple one-hot state transitions 3
+- 🔴Finate State Machines - Simple one-hot state transitions 3
 
 ---
 
@@ -148,7 +148,6 @@ module top_module (
     end
 endmodule
 ```
-
 
 ---
 
@@ -263,12 +262,11 @@ always @(*) begin
 end
 endmodule
 ```
+
 ---
 
 ## Verilog Language - More verilog features - Combinational for-loop : Vector reversal 
 <img width="605" height="50" alt="image" src="https://github.com/user-attachments/assets/ee586388-0ad8-40d3-a3d7-c5308dcf690e" />
-
-## 🔧 generate 通式
 
 ### 基本架構
 
@@ -280,6 +278,7 @@ generate
     end
 endgenerate
 ```
+
 ### 三個語法要點
 
 | 規則 | 為什麼 |
@@ -324,11 +323,11 @@ module top_module(
     //assign out = $countones(in);      SystemVerilog 內建函式
 endmodule
 ```
+
 ---
 
 ## Verilog Language - More verilog features - Generate for-loop : 100-bit binary adder 2
 <img width="1523" height="113" alt="image" src="https://github.com/user-attachments/assets/5d478d84-4f01-4ced-9f79-bb73736e7359" />
-
 
 ### Write your solution here
 ```verilog
@@ -461,7 +460,7 @@ endmodule
   assign out_any       = in | {1'b0, in[3:1]};
   assign out_different = in ^ {in[0], in[3:1]};
   ```
-## 邏輯 vs 位元運算子
+### 邏輯 vs 位元運算子
 
 | 類型 | 運算子 | 結果寬度 | 用途 |
 |------|--------|---------|------|
@@ -530,8 +529,6 @@ endmodule
 
 ## Circuits - Combinational Logic - Arithmetic - Signed addition overflow
 <img width="1521" height="74" alt="image" src="https://github.com/user-attachments/assets/58da8010-8902-4671-8c95-b3d4a5cf185f" />
-
-## 🔧 二補數還原公式
 
 ### 核心公式
 
@@ -798,7 +795,6 @@ endmodule
 ## Circuits - Sequemtial Logic - Latches and Flip-Flops - Detect both edges
 <img width="860" height="304" alt="image" src="https://github.com/user-attachments/assets/80c53bff-cc64-40fa-90eb-bd2f8de84b96" />
 
-## 邊緣偵測公式速查
 ### 三種偵測方式
 | 偵測什麼 | 公式 |
 |---------|------|
