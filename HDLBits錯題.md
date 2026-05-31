@@ -47,6 +47,7 @@
 - 🟢Shift Registers - 3-input LUT
 - 🟢More Circuits - Rule 90
 - 🔴More Circuits - Rule 110
+- output 怎麼驅動
 - 🔴Finate State Machines - Simple one-hot state transitions 3
 
 ---
@@ -1508,6 +1509,18 @@ module top_module(
     end
 endmodule
 ```
+
+---
+### ⭐ output 怎麼驅動(超常踩,集中記)
+
+| output 怎麼被驅動 | 宣告 | 用 assign? |
+|---|---|---|
+| 在 always 裡賦值(暫存器,如 count、q) | `output reg` | ❌ 不用,直接在 always 寫 |
+| 用連續賦值驅動(組合,如 out) | `output`(wire) | ✅ 要 assign |
+
+- assign 給「組合輸出」(值跟輸入即時變)
+- always 賦值給「暫存器輸出」(值在 clock 邊緣更新)
+- 兩者互斥:同一訊號不能又 assign 又在 always 賦值 → multiple driver
 
 ---
 
