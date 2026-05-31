@@ -47,7 +47,7 @@
 - 🟢Shift Registers - 3-input LUT
 - 🟢More Circuits - Rule 90
 - 🔴More Circuits - Rule 110
-- output 怎麼驅動
+- 🔴output 怎麼驅動
 - 🔴Finate State Machines - Simple one-hot state transitions 3
 
 ---
