@@ -49,10 +49,6 @@
 - 🔴More Circuits - Rule 110
 - Finate State Machines - Simple one-hot state transitions 3
 
-### 附錄
-- 🔧 核心觀念整理(精簡版)
-- ⚠️ 最常踩雷
-
 ---
 
 ## Verilog Language - Vectors - Vector concatenation operator
