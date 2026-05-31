@@ -431,7 +431,7 @@ endmodule
 module top_module ( input [1:0] A, input [1:0] B, output z ); 
     assign z = &(~(A ^ B));
     //assign z = A == B;
-    //assign z = A[1] == B[1] && A[2] == B[2];
+    //assign z = A[0] == B[0] && A[1] == B[1];
 endmodule
 
 ```
