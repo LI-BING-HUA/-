@@ -422,6 +422,7 @@ endmodule
 ---
 
 ## Circuits - Combinational Logic - Basic Gates - Two-bit equality
+<img width="1568" height="135" alt="image" src="https://github.com/user-attachments/assets/e9b70829-9fad-4695-a0a5-2652da3ec0b0" />
 
 第一次寫 `assign z = ~(A ^ B);` → 錯(`~(A^B)` 是 2-bit,z 只 1-bit,被截掉只剩最低位 → A=10,B=00 誤判 z=1)
 
