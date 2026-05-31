@@ -47,6 +47,7 @@
 - 🟢Shift Registers - 3-input LUT
 - 🟢More Circuits - Rule 90
 - 🔴More Circuits - Rule 110
+- Finate State Machines - Simple one-hot state transitions 3
 
 ### 附錄
 - 🔧 核心觀念整理(精簡版)
@@ -1512,6 +1513,51 @@ module top_module(
         if (load) q <= data;
         else      q <= (C | R) & ~(L & C & R);
     end
+endmodule
+```
+
+---
+
+## Circuits - Sequemtial Logic - Finate State Machines - Simple one-hot state transitions 3
+<img width="1571" height="527" alt="image" src="https://github.com/user-attachments/assets/842c4af0-3685-4acb-8096-5a0564538f2b" />
+
+### one-hot FSM 推導法（防非法輸入）
+
+- 判斷狀態：用 state[索引] 讀單一位元，絕不用 == 整值
+  （testbench 餵非 one-hot 值，== 會判錯）
+- parameter A=0,B=1.. = 位元索引（A的1在第0位），不是狀態值
+- next_state[X] = 把「所有會進入 X 的(來源狀態 & 輸入)」OR 起來
+  例：next_state[B] = state[A]&in | state[B]&in | state[D]&in
+- out = state[D]（D 的位元，Moore 輸出讀位元）
+
+### 核心：兩種寫法，parameter 存的東西不一樣
+ 
+| 寫法 | parameter 存什麼 | 怎麼判斷狀態 | 那組 one-hot 值有用嗎 |
+|---|---|---|---|
+| **逐位讀**（這題要求） | 位元索引 `A=0,B=1,C=2,D=3` | `state[A]` 讀單一位元 | ❌ 用不到（只用到「第幾位」） |
+| **case 比值** | one-hot 值 `A=4'b0001...` | `case(state)` 比整個值 | ✅ 必需，case 靠它比對 |
+ 
+> 重點：題目給 `A=4'b0001, B=4'b0010, C=4'b0100, D=4'b1000` 這組值，
+> **只有 case 寫法才真的用到**。逐位讀寫法只取「1 在第幾位」（→ 索引），值本身用不到。
+
+### Write your solution here
+```verilog
+module top_module(
+    input in,
+    input [3:0] state,
+    output [3:0] next_state,
+    output out); //
+
+    parameter A=0, B=1, C=2, D=3;
+
+    // State transition logic: Derive an equation for each state flip-flop.
+    assign next_state[A] = (state[A] && ~in) || (state[C] && ~in);                            // 誰會進 A
+    assign next_state[B] = (state[A] && in) || (state[B] && in) || (state[D] && in);          // 誰會進 B
+    assign next_state[C] = (state[B] && ~in) || (state[D] && ~in);                            // 誰會進 C
+    assign next_state[D] = (state[C] && in);                                                  // 誰會進 D
+
+    // Output logic: 
+    assign out = state[D];  // = state[3]，D 的位元
 endmodule
 ```
 
