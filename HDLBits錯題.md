@@ -22,6 +22,7 @@
 - 🔴 More verilog features - Generate for-loop: 100-digit BCD adder
 
 ### Circuits - Combinational Logic
+- 🟢 三種描述風格 + Gate Primitives
 - 🟡 Basic Gates - Two-bit equality
 - 🟡 Basic Gates - Gates and Vectors
 - 🟢 Multiplexers - 9-to-1 multiplexer
@@ -32,23 +33,23 @@
 ### Circuits - Sequential Logic
 - 🟡 Latches and Flip-Flops - DFF with reset value
 - 🟡 Latches and Flip-Flops - DFF with byte enable
-- 🟢Latches and Flip-Flops - D Latch
-- 🔴Latches and Flip-Flops - Detect both edges
-- 🔴Latches and Flip-Flops - Edge capture register
-- 🔴Latches and Flip-Flops - Dual-edge triggered flip-flop
-- 🟡Counters - Slow decade counter
-- 🔴Counters - Counter 1-12
-- 🔴Counters - Counter 1000
-- 🔴Counters - 4-digit decimal counter
-- 🟡Counters - 12-hour clock
-- 🔴Shift Registers - Left/right arithmetic shift by 1 or 8
-- 🟡Shift Registers - shift register 1
-- 🟡Shift Registers - shift register 2
-- 🟢Shift Registers - 3-input LUT
-- 🟢More Circuits - Rule 90
-- 🔴More Circuits - Rule 110
-- 🔴output 怎麼驅動
-- 🔴Finate State Machines - Simple one-hot state transitions 3
+- 🟢 Latches and Flip-Flops - D Latch
+- 🔴 Latches and Flip-Flops - Detect both edges
+- 🔴 Latches and Flip-Flops - Edge capture register
+- 🔴 Latches and Flip-Flops - Dual-edge triggered flip-flop
+- 🟡 Counters - Slow decade counter
+- 🔴 Counters - Counter 1-12
+- 🔴 Counters - Counter 1000
+- 🔴 Counters - 4-digit decimal counter
+- 🟡 Counters - 12-hour clock
+- 🔴 Shift Registers - Left/right arithmetic shift by 1 or 8
+- 🟡 Shift Registers - shift register 1
+- 🟡 Shift Registers - shift register 2
+- 🟢 Shift Registers - 3-input LUT
+- 🟢 More Circuits - Rule 90
+- 🔴 More Circuits - Rule 110
+- 🔴 output 怎麼驅動
+- 🔴 Finate State Machines - Simple one-hot state transitions 3
 
 ---
 
@@ -419,6 +420,30 @@ module top_module (
     endgenerate
 endmodule
 ```
+
+---
+
+### ⭐ 三種描述風格 + Gate Primitives(雜項速查)
+
+Verilog 描述電路有三種風格,同一個邏輯三種都能寫:
+
+| 風格 | 寫法 | 範例 |
+|---|---|---|
+| Dataflow | `assign` | `assign out = a & b;` |
+| Behavioral | `always` | `always @(*) out = a & b;` |
+| Gate-level | 實例化閘 | `and (out, a, b);` |
+
+### Gate primitives 語法:`閘類型 (輸出, 輸入...);`
+- `buf (out, in);` — 緩衝,out=in(等於 `assign out=in`)
+- `not (out, in);` — 反相
+- `and (out, a, b);` / `or` / `nand` / `nor` / `xor` / `xnor`
+- 一驅多:`buf (o1, o2, o3, in);`(前面全是輸出,最後一個是輸入)
+- 三態:`bufif1 (out, in, en);`(en=1 才導通,否則高阻 z)
+
+### 重點
+- 輸出永遠在「最前面」,輸入在後面(跟函式相反)
+- `buf`/`not` 單純緩衝/反相,HDLBits 很少單獨用 → `assign` 更直觀
+- gate-level 真正有用的場合:三態匯流排(bufif)、強調扇出
 
 ---
 
