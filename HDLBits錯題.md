@@ -1613,11 +1613,6 @@ Verilog 描述電路有三種風格,同一個邏輯三種都能寫:
 - 一驅多:`buf (o1, o2, o3, in);`(前面全是輸出,最後一個是輸入)
 - 三態:`bufif1 (out, in, en);`(en=1 才導通,否則高阻 z)
 
-### 重點
-- 輸出永遠在「最前面」,輸入在後面(跟函式相反)
-- `buf`/`not` 單純緩衝/反相,HDLBits 很少單獨用 → `assign` 更直觀
-- gate-level 真正有用的場合:三態匯流排(bufif)、強調扇出
-
 ---
 
 ### ⭐ output 怎麼驅動(超常踩,集中記)
@@ -1634,39 +1629,11 @@ Verilog 描述電路有三種風格,同一個邏輯三種都能寫:
 ---
 ## 🔴 觀念釐清:reg / wire / 記憶 三者關係(最常混)
 
-### 核心一句話
-> **reg ≠ 暫存器(記憶)**。reg 只是「要在 always 裡被賦值」的語法要求,跟有沒有記憶完全無關。
-> **有沒有記憶,看 always 的敏感列表**:`@(posedge clk)` 有記憶、`@(*)` 沒記憶。
-
-### reg 這個字名字取得爛
-- `reg` 聽起來像 register(暫存器/會記憶),但它真正的意思只是:
-  **「這個訊號會在 always 或 initial 區塊裡被賦值」**。純語法,不代表有記憶。
-
-### 同樣宣告 reg,寫法不同 → 合成完全不同
-
 | 寫法 | 宣告 | 賦值符 | 合成結果 | 有記憶? |
 |---|---|---|---|---|
 | `always @(*)` | `reg` | `=` | 組合邏輯(閘) | ❌ 沒有 |
 | `always @(posedge clk)` | `reg` | `<=` | 暫存器(FF) | ✅ 有 |
 | `assign` | `wire` | `assign` | 組合邏輯(閘) | ❌ 沒有 |
-
-→ 注意最後兩列:`always @(*)`(reg) 和 `assign`(wire) **都是組合、都沒記憶**,
-   只是一個用 reg 一個用 wire。**再次證明 reg/wire 跟記憶無關,只跟「在哪賦值」有關。**
-
-### 範例對照
-```verilog
-// 組合,沒記憶 —— 雖然是 reg
-reg out;
-always @(*) out = a & b;        // 合成成 AND 閘,out 跟著 a,b 即時變
-
-// 循序,有記憶 —— 同樣是 reg
-reg out;
-always @(posedge clk) out <= a & b;   // 合成成 DFF,clock 邊緣才更新
-```
-
-### 套用:Decode scancodes / mux / priority encoder 這類「查表組合」
-- 它們 `always @(*)` + `output reg` → **是組合、沒記憶**,reg 只是因為在 always 裡賦值才宣告。
-- 別被 reg 騙以為它變暫存器了。
 
 ### 一句話總結
 > - **reg / wire** = 看「在哪賦值」(always 用 reg、assign 用 wire),**與記憶無關**
