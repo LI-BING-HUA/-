@@ -1612,7 +1612,7 @@ endmodule
 | C | 已收到10,等1 | in=1→D(標頭101完成,count歸0), in=0→A |
 | D | 收8個資料bit | count 0→8;count==8→A |
 
-<img width="1568" height="722" alt="image" src="https://github.com/user-attachments/assets/899576ae-3a0c-4ceb-8898-14330618768f" />
+<img width="795" height="319" alt="image" src="https://github.com/user-attachments/assets/98052384-32ac-49ce-88c7-30a8d6703725" />
 
 ### ⭐ 時序圖 state 標法(秒懂「為什麼讀到1當下還是A」)
 > 上升緣「讀 in 的當下」state 還是舊的(A),`state <= next_state` 是 `<=` → 算出的 B **晚一拍**才生效,所以「讀到1」在拍0(state=A)、「變成B」在拍1。next_state 是「下拍才生效」不是「這拍立刻變」,跟 count/out_byte 晚一拍同一個機制。
