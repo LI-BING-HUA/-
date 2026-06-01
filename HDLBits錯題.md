@@ -49,6 +49,9 @@
 - 🔴 More Circuits - Rule 110
 - 🔴 Finate State Machines - Simple one-hot state transitions 3
 
+### 練習題
+- 🔴 FSM - 串列封包接收器(Serial Receiver)
+
 ### 觀念釐清
 - 🟢 三種描述風格 + Gate Primitives
 - 🔴 output 怎麼驅動
@@ -1591,6 +1594,85 @@ module top_module(
 
     // Output logic: 
     assign out = state[D];  // = state[3]，D 的位元
+endmodule
+```
+
+---
+
+## 串列封包接收器(Serial Receiver)
+
+### 規格
+偵測標頭 `101` → 收 8 個 data bit(MSB 先) → 組成 byte,done 與 out_byte 同拍輸出 → 回去找下一個標頭。
+
+### 狀態設計(A/B/C/D)
+| 狀態 | 意義 | 轉移 |
+|---|---|---|
+| A | 找標頭第1個1 | in=1→B, 否則留 A |
+| B | 已收到1,等0 | in=1→留B(連續1), in=0→C |
+| C | 已收到10,等1 | in=1→D(標頭101完成,count歸0), in=0→A |
+| D | 收8個資料bit | count 0→8;count==8→A |
+
+### 時序心法(這題最折磨人的核心)
+- **進 D 後待 9 拍** = 收 8 個 bit(拍3~10,count 0→7 各移入一個) + 輸出那拍(拍11,count==8)。
+- 第 8 個 bit 在「count==7 那拍」移入,所以「count==8 那拍」shift_reg 已經完整。
+- done 在 count==8 亮,此時 `out_byte = shift_reg` 剛好完整,**不用補當拍 in**。
+
+### 踩雷(依順序)
+1. ❌ count 宣告 `[3:0]` 但比較寫 `3'd8`/`3'h8` → 8 裝不下 3-bit,被截成 0 → 時機全錯。改 `4'd8`。
+2. ❌ count==8 那拍還在 shift → 污染 shift_reg。要加 `&& count != 4'd8` 讓它停止移位。
+3. ❌ reset 沒清 shift_reg → 開頭 out_byte 是 XX。加 `shift_reg <= 0`。
+4. ❌ 一度把 out_byte 寫成 `{shift_reg[6:0], in}`(想補當拍 in)→ 反而錯。正解就是 `assign out_byte = shift_reg`。
+
+### 清零時機(等價變換,兩種都對)
+- 做法A(穩):進 D 前清 → `state==C && in` 時 `count<=0`。每次用前重清,self-correcting。
+- 做法B(也對):離開 D 時清 → `state==D && count==8` 時 `count<=0`,靠 reset 顧開頭。實測連續封包也 ALL PASS。
+- 心法:**初始化計數器,在「開始用之前」清最防呆**;但靠「reset 開頭一定來」也能成立。
+
+### 為什麼 out_byte 用 assign 不用 always(差一拍問題)
+- `assign out_byte = shift_reg`(組合)→ 持續等於 shift_reg,跟組合 done **同拍**。
+- 若改 `always` 裡 `out_byte <= shift_reg`(暫存器)→ **晚一拍**:done(組合)在 count==8 當拍就亮,但 `<=` 的值要等這個 clk 邊緣結束才生效,所以 done 亮那拍 out_byte 還是舊值 → mismatch。
+- 一句話:**組合(assign)= clk 一到就反映;always 的 `<=` = 要等邊緣結束才寫入 → 晚一拍。**
+
+### Write your solution here
+```verilog
+module top_module(
+    input clk, input reset, input in,
+    output [7:0] out_byte, output done
+);
+    localparam A=0, B=1, C=2, D=3;
+    reg [1:0] state, next_state;
+    reg [3:0] count;
+    reg [7:0] shift_reg;
+
+    always @(posedge clk) begin
+        if (reset) state <= A;
+        else       state <= next_state;
+    end
+
+    always @(*) begin
+        case(state)
+            A: next_state = in ? B : A;
+            B: next_state = in ? B : C;
+            C: next_state = in ? D : A;
+            D: next_state = (count == 4'd8) ? A : D;
+            default: next_state = A;
+        endcase
+    end
+
+    always @(posedge clk) begin
+        if (reset) begin
+            count <= 0; shift_reg <= 0;
+        end
+        else if (state == C && in)
+            count <= 0;
+        else if (state == D && count != 4'd8) begin   // count==8 停止移位
+            count     <= count + 1;
+            shift_reg <= {shift_reg[6:0], in};
+        end
+    end
+
+    assign done     = (state == D) && (count == 4'd8);
+    assign out_byte = shift_reg;   // 組合,跟 done 同拍;不用補當拍 in
 endmodule
 ```
 
