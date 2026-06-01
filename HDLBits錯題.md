@@ -1617,7 +1617,7 @@ endmodule
 ### ⭐ 時序圖 state 標法(秒懂「為什麼讀到1當下還是A」)
 > 上升緣「讀 in 的當下」state 還是舊的(A),`state <= next_state` 是 `<=` → 算出的 B **晚一拍**才生效,所以「讀到1」在拍0(state=A)、「變成B」在拍1。next_state 是「下拍才生效」不是「這拍立刻變」,跟 count/out_byte 晚一拍同一個機制。
 
-![Uploading image.png…]()
+<img width="1148" height="1050" alt="image" src="https://github.com/user-attachments/assets/6818eaa0-cb6f-40fe-a9dc-14f1cfd32b2d" />
 
 ### 清零時機(等價變換,兩種都對)
 - 做法A(穩):進 D 前清 → `state==C && in` 時 `count<=0`。每次用前重清,self-correcting。
