@@ -50,7 +50,7 @@
 - 🔴 Finate State Machines - Simple one-hot state transitions 3
 
 ### 練習題
-- 🔴 FSM - 串列封包接收器(Serial Receiver)
+- 🔴 串列封包接收器(Serial Receiver)
 
 ### 觀念釐清
 - 🟢 三種描述風格 + Gate Primitives
