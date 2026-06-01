@@ -1630,43 +1630,60 @@ endmodule
 ### Write your solution here
 ```verilog
 module top_module(
-    input clk, input reset, input in,
-    output [7:0] out_byte, output done
+    input clk,
+    input reset,
+    input in,
+    output [7:0] out_byte,
+    output done
 );
-    localparam A=0, B=1, C=2, D=3;
-    reg [1:0] state, next_state;
-    reg [3:0] count;
-    reg [7:0] shift_reg;
 
-    always @(posedge clk) begin
-        if (reset) state <= A;
-        else       state <= next_state;
-    end
+localparam A = 0, B = 1, C = 2, D = 3;
+reg [1:0] state, next_state;
+reg [3:0] count;
+reg [7:0] shift_reg;
 
-    always @(*) begin
-        case(state)
-            A: next_state = in ? B : A;
-            B: next_state = in ? B : C;
-            C: next_state = in ? D : A;
-            D: next_state = (count == 4'd8) ? A : D;
-            default: next_state = A;
-        endcase
-    end
+always @(posedge clk) begin
+    if (reset)
+        state <= A;
+    else
+        state <= next_state;
+end
 
-    always @(posedge clk) begin
-        if (reset) begin
-            count <= 0; shift_reg <= 0;
+always @(*) begin
+    case(state)
+        A: begin
+            if (in)    next_state = B;
+            else       next_state = A;
         end
+        B: begin
+            if (in)    next_state = B;
+            else       next_state = C;
+        end
+        C: begin
+            if (in)    next_state = D;
+            else       next_state = A;
+        end
+        D: begin
+            if (count == 4'd8)  next_state = A; 
+            else                next_state = D;
+        end
+        default next_state = A;
+    endcase
+end
+
+always @(posedge clk) begin
+        if (reset)
+            count     <= 0;
         else if (state == C && in)
             count <= 0;
-        else if (state == D && count != 4'd8) begin   // count==8 停止移位
-            count     <= count + 1;
+        else if (state == D && count != 4'd8) begin
+            count <= count + 1; 
             shift_reg <= {shift_reg[6:0], in};
         end
-    end
+end
 
-    assign done     = (state == D) && (count == 4'd8);
-    assign out_byte = shift_reg;   // 組合,跟 done 同拍;不用補當拍 in
+assign done = (state == D) && (count == 4'd8);
+assign out_byte = shift_reg; 
 endmodule
 ```
 
