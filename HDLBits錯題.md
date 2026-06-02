@@ -48,7 +48,7 @@
 - 🟢 More Circuits - Rule 90
 - 🔴 More Circuits - Rule 110
 - 🔴 Finate State Machines - Simple one-hot state transitions 3
-- Finate State Machines - Design aMoore FSM
+- Finate State Machines - Design a Moore FSM
 - Finate State Machines - Lemmings3
 - Finate State Machines - Lemmings4
 
