@@ -1,100 +1,58 @@
-## function vs task 的完整比較
+# ⚡ Verilog 心法速查(一頁版)
 
-| 項目 | `function` | `task` |
-|------|-----------|--------|
-| **輸入** | 只能有 input | input、output、inout 都可以 |
-| **輸出** | 只能 1 個（透過函數名回傳） | 可以多個（透過 output 參數） |
-| **呼叫方式** | `y = func(...)`（用等號接） | `task(...)`（直接呼叫，沒等號） |
-| **可以有延遲嗎？**（`#10`、`@`、`wait`） | ❌ 不行 | ✅ 可以 |
-| **執行時間** | 0 時間（不消耗模擬時間） | 可消耗時間 |
-| **可以呼叫 task 嗎？** | ❌ 不行 | ✅ 可以呼叫 task 和 function |
+## 🔴 最常踩(每次寫都檢查)
 
-## case / casez / casex 重點
+**reg / wire / 記憶**
+- assign 配 wire、always 配 reg
+- reg ≠ 記憶!記憶看敏感列表:`@(posedge clk)`有、`@(*)`沒有
+- `always @(*)`+reg 和 assign 都是組合無記憶
 
-- **沒給初始值時(訊號是 x):**
-  - `casex`:**所有 pattern 都會匹配**,但只執行第一條就停,後面不會跑 ⚠️ → bug 被掩蓋
-  - `casez`:x 不被當不在乎 → 不匹配,走 default ✅ 安全
-  - `case`: x 嚴格比對 → 不匹配,走 default ✅ 安全
+**Multiple Driver(一訊號只能一個驅動者)**
+- assign / always / 子模組輸出,三選一,不可混
+- 衝突就插中間 wire 分開
+- generate 每圈打同一條 → 撞多次;該用「一條 assign + 來源全 OR」
 
-- **don't care 符號:**
-  - `case`:不支援
-  - `casez`:`?`、`z` 算 don't care
-  - `casex`:`?`、`z`、`x` 都算 don't care(連訊號本身的 x 也算 → 危險)
+**晚一拍(時序核心)**
+- 組合(assign、`@(*)`)= clk 一到就反映,當拍生效
+- always 的 `<=` = 要等邊緣結束才寫入 → 晚一拍
+- next_state 同理:這拍算、下拍才變(「讀到1當下還是A」就是這個)
 
-- **結論:用 `casez` + `?`,別用 `casex`**
+## 🔴 計數器 / datapath
 
----
+**計數器每次用前歸零**(最容易忘)
+- 不能只靠 reset 顧開頭;每次重新使用都要乾淨
+- 封包 count、splat fall_clk 都栽在這
 
-### 範例一:有給初值(假設 in = `4'b0100`)
+**datapath 跟 state 分塊寫**
+- count / shift_reg / 方向reg / accumulator / prev / flag → 各自獨立塊
+- 判準:更新條件不同就分塊(每拍變 vs 看條件變、不同邊緣、不同時脈)
+- 純 counter(沒 FSM)才合一塊
 
-**case** → 完全比對 `4'b0100`,沒這條 → 走 default,`out = 2'd0`
+## 🔴 FSM
 
-    case (in)               // in = 4'b0100
-        4'b1000: out = 2'd3;
-        4'b0100: out = 2'd2; // ✅ 完全匹配
-        4'b0010: out = 2'd1;
-        4'b0001: out = 2'd0;
-        default: out = 2'd0;
-    endcase
-    // out = 2'd2
+- **優先級逐層攔截**:if/else if 鏈,高優先(reset/fall/邊界)寫前面;別用獨立 if(會互相覆蓋)
+- **要記的歷史 → 編進狀態(展開)或放 reg(摺疊)**;題目要 Moore 用展開版
+- **trap state**(死狀態):`next_state = 自己` 無條件(別寫條件,藏 latch)
+- one-hot:用 `state[索引]` 讀位元,別用 `==` 整值(防非法輸入)
 
-**casez** → 第二條 `4'b01??` 中,`out = 2'd2`
+## 🟡 數字 / 位寬
 
-    casez (in)              // in = 4'b0100
-        4'b1???: out = 2'd3;
-        4'b01??: out = 2'd2; // ✅ 中
-        4'b001?: out = 2'd1;
-        4'b0001: out = 2'd0;
-        default: out = 2'd0;
-    endcase
-    // out = 2'd2
+- **真計數用 `'d`、BCD 用 `'h`**(fall_clk 寫 5'd21,別寫 5'h15 會看成15)
+- 位寬要夠:`[3:0]` 配 `3'd8` 會截成 0
+- `||` `&&` 是邏輯(結果1bit),不能列舉多值:要 `state==DL || state==DR`(不是 `state==(DL||DR)`)
+- 邏輯運算子 `&&|| !` 結果永遠1bit;位元 `&|~^` 跟輸入同寬
 
-**casex** → 第二條 `4'b01xx` 中,`out = 2'd2`
+## 🟡 reset / latch / 移位
 
-    casex (in)              // in = 4'b0100
-        4'b1xxx: out = 2'd3;
-        4'b01xx: out = 2'd2; // ✅ 中
-        4'b001x: out = 2'd1;
-        4'b0001: out = 2'd0;
-        default: out = 2'd0;
-    endcase
-    // out = 2'd2
+- reset 同步:敏感列表只有 clk;非同步:加 `or posedge reset`
+- active-low(resetn、有圈圈)→ `if(!resetn)`
+- 組合 latch:case 加 default 或進 case 前給預設值
+- `>>>` 算術右移要 signed 才補符號位;`{}` 拼接最保險(動量需常數)
 
-→ 正常值下,三種行為一樣 ✅
+## 🟢 實作 / 工具
 
----
-
-### 範例二:沒給初值(in = `4'bxxxx`)
-
-**case** → x 嚴格比對,沒一條中 → 走 default,`out = 2'd0` ✅
-
-    case (in)               // in = 4'bxxxx
-        4'b1000: out = 2'd3;
-        4'b0100: out = 2'd2;
-        4'b0010: out = 2'd1;
-        4'b0001: out = 2'd0;
-        default: out = 2'd0; // ✅ 走這條
-    endcase
-    // out = 2'd0(安全)
-
-**casez** → x 不被當不在乎,沒一條中 → 走 default,`out = 2'd0` ✅
-
-    casez (in)              // in = 4'bxxxx
-        4'b1???: out = 2'd3;
-        4'b01??: out = 2'd2;
-        4'b001?: out = 2'd1;
-        4'b0001: out = 2'd0;
-        default: out = 2'd0; // ✅ 走這條
-    endcase
-    // out = 2'd0(安全)
-
-**casex** → 所有條都匹配,停在第一條 → `out = 2'd3` ⚠️
-
-    casex (in)              // in = 4'bxxxx
-        4'b1xxx: out = 2'd3; // ✅ 中這條就停,out = 2'd3
-        4'b01xx: out = 2'd2; // 也匹配,但走不到
-        4'b001x: out = 2'd1; // 也匹配,但走不到
-        4'b0001: out = 2'd0; // 也匹配,但走不到
-        default: out = 2'd0; // 永遠走不到 ⚠️
-    endcase
-    // out = 2'd3(bug 被掩蓋)
+- assign 驅動的 output 別宣告 reg
+- Vivado 紅波浪線常誤報,真錯看 Tcl Console / elaborate.log
+- 用別人 tb:內部訊號名要跟 tb 的階層存取一致(top.cnt → 你要叫 cnt)
+- 模擬慢:分頻門檻改小,上板再改回
+- XDC:看得懂就好,port 名要跟 code 完全一致
