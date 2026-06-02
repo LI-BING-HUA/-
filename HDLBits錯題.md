@@ -2389,19 +2389,36 @@ assign next_state[0] = (state[0]&~in)|(state[1]&~in)|(state[2]&~in);
 | 組合塊 | 算 next_state | `always @(*) case(state)...` |
 | 資料塊 | datapath(count/shift_reg等) | `always @(posedge clk) if(...) count <= ...` |
 
-### 該分開的時機(不只 count)
-**① state 和 count 分開**(最常見)
-- state 每拍都更新、count 只在特定狀態更新 → 條件不同,分開
-- 例:封包接收器(state 一塊、count+shift_reg 一塊)、跑馬燈(FSM 一塊、分頻 cnt 一塊)
+FSM 的 state/next_state 是「控制」,以下這些是「資料」,通常各自獨立在自己的 always 塊(更新條件跟 state 不同):
 
-**② 不同觸發邊緣 → 一定分**
-- posedge 和 negedge 不能在同一塊(會 multiple driver)
-- 例:dual-edge FF —— `always @(posedge clk) q_pos<=d;` 和 `always @(negedge clk) q_neg<=d;` 分兩塊,再 XOR 合併
+**① 計數器 count / counter**
+- 數拍數、數次數,只在特定狀態 +1
+- 例:封包接收器數 8 個 bit、跑馬燈分頻、splat 數掉落拍
 
-**③ 不同時脈來源 → 一定分**
-- 不同 clock 驅動的暫存器,絕不能同塊
-- 例:跨時脈域設計(clk_a 一塊、clk_b 一塊)
+**② 移位暫存器 shift_reg**
+- 一拍移入一個 bit,組成資料
+- 例:封包接收器 `shift_reg <= {shift_reg[6:0], in}`
 
-**④ 組合 vs 時脈 → 一定分**
-- `always @(*)`(組合)和 `always @(posedge clk)`(時脈)本質不同,分開
-- 例:FSM 的 next_state(組合)和 state(時脈)
+**③ 方向/模式記憶 reg(fall_loc / dig_loc / prev_dir)**
+- 記「上一個方向、上一個模式」這種歷史
+- 例:旅鼠摺疊版用 fall_loc 記掉落方向
+
+**④ 累加器 accumulator / sum**
+- 累加數值
+- 例:把一連串輸入加總
+
+**⑤ 上一拍的值 prev / last(延遲一拍)**
+- 記住上個 clock 的輸入,用來比較
+- 例:edge detect 的 `in_prev <= in`(偵測邊緣)
+
+**⑥ 旗標 flag / sticky bit**
+- 「事件發生過」就記住,維持到清除
+- 例:edge capture register 的 sticky 累積
+
+### 共通點
+> 這些都是「**資料(datapath)**」,有自己的更新節奏(只在某狀態/某條件動),
+> 跟「**控制(state)**」每拍換代的節奏不同 → 各自獨立一塊,別跟 state 混。
+
+### 判準
+> 看到「要記住、要累加、要計數、要移位、要延遲一拍」的東西 → 它是 datapath,獨立一塊。
+> state/next_state 是控制,另外兩塊(時脈換代 + 組合算 next)。
