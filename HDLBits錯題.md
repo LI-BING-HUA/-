@@ -1717,7 +1717,7 @@ endmodule
 
 - assign 給「組合輸出」(值跟輸入即時變)
 - always 賦值給「暫存器輸出」(值在 clock 邊緣更新)
-- 兩者互斥:同一訊號不能又 assign 又在 always 賦值 → multiple driver
+- 兩者互斥:同一訊號不能又 assign 又在 always 賦值, 也不可以實例化又 assign, 中間可以用wire幫忙 → multiple driver
 
 ---
 ## reg / wire / 記憶 三者關係(最常混)
