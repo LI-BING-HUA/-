@@ -1719,7 +1719,52 @@ endmodule
 - always 賦值給「暫存器輸出」(值在 clock 邊緣更新)
 - 兩者互斥:同一訊號不能又 assign 又在 always 賦值, 也不可以實例化又 assign, 中間可以用wire幫忙 → multiple driver
 
+```verilog
+// ❌ 例1:子模組輸出 + assign 都打 out
+andgate u1 (..., .out(out));
+assign out = ~out;
+// ✅ 加中間 wire 分開
+wire and_out;
+andgate u1 (..., .out(and_out));
+assign out = ~and_out;
+```
+
+```verilog
+// ❌ 例2:assign + always 都打 sum
+assign sum = a + b;
+always @(*) sum = a + b;
+// ✅ 選一個(留 assign 或 always)
+```
+
+```verilog
+// ❌ 例3:兩個 always 都打 q(dual-edge 經典)
+always @(posedge clk) q <= d;
+always @(negedge clk) q <= d;
+// ✅ 各自 reg + 合併
+reg q_pos, q_neg;
+always @(posedge clk) q_pos <= d;
+always @(negedge clk) q_neg <= d;
+assign q = clk ? q_pos : q_neg;
+```
+
+```verilog
+// ❌ 例4:子模組自己數 + 又 assign(4-digit counter 踩過)
+Countbcd u1(..., .q(q[3:0]));
+assign q[3:0] = q[3:0] + 1;
+// ✅ 數數交給子模組,自己不要再 assign
+```
+
+```verilog
+// ❌ 例5:generate 迴圈每圈打同一條線
+for (i=0;i<10;i=i+1) begin:loop
+    assign next_state[0] = state[i] & ~in;   // 撞 8 次
+end
+// ✅ 一條 assign + 來源全 OR
+assign next_state[0] = (state[0]&~in)|(state[1]&~in)|(state[2]&~in);
+```
+
 ---
+
 ## reg / wire / 記憶 三者關係(最常混)
 
 | 寫法 | 宣告 | 賦值符 | 合成結果 | 有記憶? |
