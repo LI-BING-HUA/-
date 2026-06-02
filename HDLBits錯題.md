@@ -55,10 +55,14 @@
 ### 練習題
 - 🔴 串列封包接收器(Serial Receiver)
 
+### 實驗題
+- 🟡 PYNQ-Z2 跑馬燈 (Marquee)
+
 ### 觀念釐清
 - 🟢 三種描述風格 + Gate Primitives
 - 🔴 output 怎麼驅動
 - 🔴 觀念釐清:reg / wire / 記憶 三者關係(最常混)
+- 🔴 什麼時機要「分 always 塊」處理
 
 ---
 
@@ -2201,6 +2205,90 @@ endmodule
 
 ---
 
+## PYNQ-Z2 跑馬燈 (Marquee)
+
+### 規格(課堂實驗,只給兩行,細節自定義)
+4 顆 LED,每 0.5 秒移動一格。`module Marquee(input clk, reset, output [3:0] led)`。
+方向/繞回/同步等細節留白 → 自己定義(這是實驗題 vs HDLBits 的差別)。
+
+### 設計:分頻 + FSM(控制與資料分離)
+- 分頻:count 數到 0.5秒(125MHz × 0.5 = 62,499,999 拍),產生 pass 訊號
+- FSM:pass 那拍 state 移一格(A→B→C→D→A),led 跟著 state 亮
+
+### 踩雷
+- ❌ `output reg [3:0] led` 配 assign → reg/wire 衝突,拿掉 reg
+- 模擬慢:門檻 62499999 模擬要跑超久 → 模擬時改小(如3),上板再改回
+- 用助教 tb:tb 用 `top.cnt` 階層存取 → 內部 counter 名要叫 `cnt`(跟 tb 一致)
+- 模擬驗證波形:led x→1→2→4→8→1 循環即正確
+
+### Write your solution here
+```verilog
+module Marquee (
+    input clk, reset,
+    output [3:0] led
+);
+localparam A = 0, B = 1, C = 2, D = 3;
+reg [25:0] cnt;
+reg [1:0] state, next_state;
+wire pass;
+
+assign pass = cnt == 26'd3;
+
+always @(posedge clk or posedge reset) begin
+    if (reset)
+        state <= A;
+    else
+        state <= next_state;
+end
+
+always @(*) begin
+    case(state)
+        A: begin
+            if (pass)
+                next_state = B;
+            else
+                next_state = A;
+        end
+        B: begin
+            if (pass)
+                next_state = C;
+            else
+                next_state = B;
+        end
+        C: begin
+            if (pass)
+                next_state = D;
+            else
+                next_state = C;
+        end
+        D: begin
+            if (pass)
+                next_state = A;
+            else
+                next_state = D;
+        end
+        default next_state = A;
+    endcase
+end
+
+always @(posedge clk or posedge reset) begin
+    if (reset)
+        cnt <= 1'b0;
+    else if (pass)
+        cnt <= 1'b0;
+    else
+        cnt <= cnt + 1'b1;
+end
+
+assign led[0] = state == A;
+assign led[1] = state == B;
+assign led[2] = state == C;
+assign led[3] = state == D;
+endmodule
+```
+
+---
+
 ## 三種描述風格 + Gate Primitives(雜項速查)
 
 ### Verilog 描述電路有三種風格,同一個邏輯三種都能寫:
@@ -2289,3 +2377,25 @@ assign next_state[0] = (state[0]&~in)|(state[1]&~in)|(state[2]&~in);
 > - **reg / wire** = 看「在哪賦值」(always 用 reg、assign 用 wire),**與記憶無關**
 > - **記憶** = 看敏感列表(`@(posedge clk)` 有、`@(*)` 沒有)
 > - `always @(*)` + reg = 組合無記憶;`always @(posedge clk)` + reg = 循序有記憶
+
+---
+
+## 什麼時機要「分 always 塊」處理
+
+### FSM 標準三塊式(各管一件事)
+| 塊 | 職責 | 寫法 |
+|---|---|---|
+| 時脈塊 | state 換代 | `always @(posedge clk) state <= next_state` |
+| 組合塊 | 算 next_state | `always @(*) case(state)...` |
+| 資料塊 | datapath(count/shift_reg等) | `always @(posedge clk) if(...) count <= ...` |
+
+### 該分開的時機(不只 count)
+| 時機 | 為什麼分 | 例子 |
+|---|---|---|
+| **更新條件不同** | state 每拍更新、count 只在特定狀態更新 → 混一起難管 | 封包 count、splat fall_clk |
+| **控制 vs 資料** | state(控制)和 count/shift_reg(資料)性質不同 | FSM + datapath |
+| **時脈域不同** | 不同 clock 驅動的訊號絕不能同塊 | 跨時脈設計 |
+| **同步 vs 非同步 reset** | 一個要 areset、一個不用 → 敏感列表不同 | — |
+| **不同觸發邊緣** | posedge 和 negedge 不能同塊(multiple driver) | dual-edge FF |
+| **可讀性/除錯** | 每塊單純 → 好讀好抓 bug | 任何複雜模組 |
+
