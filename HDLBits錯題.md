@@ -2390,12 +2390,18 @@ assign next_state[0] = (state[0]&~in)|(state[1]&~in)|(state[2]&~in);
 | 資料塊 | datapath(count/shift_reg等) | `always @(posedge clk) if(...) count <= ...` |
 
 ### 該分開的時機(不只 count)
-| 時機 | 為什麼分 | 例子 |
-|---|---|---|
-| **更新條件不同** | state 每拍更新、count 只在特定狀態更新 → 混一起難管 | 封包 count、splat fall_clk |
-| **控制 vs 資料** | state(控制)和 count/shift_reg(資料)性質不同 | FSM + datapath |
-| **時脈域不同** | 不同 clock 驅動的訊號絕不能同塊 | 跨時脈設計 |
-| **同步 vs 非同步 reset** | 一個要 areset、一個不用 → 敏感列表不同 | — |
-| **不同觸發邊緣** | posedge 和 negedge 不能同塊(multiple driver) | dual-edge FF |
-| **可讀性/除錯** | 每塊單純 → 好讀好抓 bug | 任何複雜模組 |
+**① state 和 count 分開**(最常見)
+- state 每拍都更新、count 只在特定狀態更新 → 條件不同,分開
+- 例:封包接收器(state 一塊、count+shift_reg 一塊)、跑馬燈(FSM 一塊、分頻 cnt 一塊)
 
+**② 不同觸發邊緣 → 一定分**
+- posedge 和 negedge 不能在同一塊(會 multiple driver)
+- 例:dual-edge FF —— `always @(posedge clk) q_pos<=d;` 和 `always @(negedge clk) q_neg<=d;` 分兩塊,再 XOR 合併
+
+**③ 不同時脈來源 → 一定分**
+- 不同 clock 驅動的暫存器,絕不能同塊
+- 例:跨時脈域設計(clk_a 一塊、clk_b 一塊)
+
+**④ 組合 vs 時脈 → 一定分**
+- `always @(*)`(組合)和 `always @(posedge clk)`(時脈)本質不同,分開
+- 例:FSM 的 next_state(組合)和 state(時脈)
