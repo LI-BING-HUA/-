@@ -48,9 +48,9 @@
 - 🟢 More Circuits - Rule 90
 - 🔴 More Circuits - Rule 110
 - 🔴 Finate State Machines - Simple one-hot state transitions 3
-- Finate State Machines - Design a Moore FSM
-- Finate State Machines - Lemmings3
-- Finate State Machines - Lemmings4
+- 🔴 Finate State Machines - Design a Moore FSM
+- 🔴 Finate State Machines - Lemmings3
+- 🔴 Finate State Machines - Lemmings4
 
 ### 練習題
 - 🔴 串列封包接收器(Serial Receiver)
@@ -1696,6 +1696,515 @@ module top_module (
     assign fr3 = (state == bot);
     assign dfr = (state == bot) | (state == l12_down) | (state == l23_down);
 
+endmodule
+```
+
+---
+
+## Circuits - Sequemtial Logic - Finate State Machines - Lemmings3
+<img width="1556" height="223" alt="image" src="https://github.com/user-attachments/assets/fc7a047c-610d-41ed-adba-5804ca7a4546" />
+
+### 狀態設計
+L/R(走) + A(掉) + D(挖),方向用 reg(fall_loc/dig_loc)記。
+
+### 踩雷(依順序,每個都是同一招的變體)
+1. 方向記憶用 **reg 不用 wire**(wire 不能在 always 賦值,也不能跨 clock 記憶)
+2. **鎖定條件要跟轉移條件一致** → 鎖 dig_loc 要加 ground 檢查(`ground && dig`)
+3. **挖掘持續到 ground=0 才停**,不是 dig 訊號結束就停(讀規格)
+4. **落地那拍優先回走路**,A 不直接連 D(優先級:fall > dig > 轉向)
+
+### 心法
+> 多 input 的 FSM 別怕:input 多不是難點,難點是「優先級」和「要記住的歷史」。
+> 拆法:①列出要記的歷史(方向→reg) ②列優先級(fall>dig>turn,寫前面) ③每個狀態只問「這輸入下我去哪」。
+
+### Write your solution here
+### 寫法A:摺疊(5狀態 + 方向reg)
+```verilog
+module top_module(
+    input clk,
+    input areset,    // Freshly brainwashed Lemmings walk left.
+    input bump_left,
+    input bump_right,
+    input ground,
+    input dig,
+    output walk_left,
+    output walk_right,
+    output aaah,
+    output digging ); 
+	
+    localparam L = 0, R = 1, A = 2, D = 3;
+    reg [1:0] state, next_state;
+    reg fall_loc, dig_loc;
+    
+    always @(posedge clk or posedge areset) begin
+        if (areset) begin
+            state <= L;
+            fall_loc <= 1;
+            dig_loc <= 1;
+        end
+        else begin
+            state <= next_state;
+            if (state == L && ~ground)
+                fall_loc <= 1;
+            if (state == R && ~ground)
+                fall_loc <= 0;
+            if (state == L && ground && dig)
+                dig_loc <= 1;
+            if (state == R && ground && dig)
+                dig_loc <= 0;
+            if (state == A && ground && dig)
+                dig_loc <= fall_loc;
+            if (state == D && ~ground)
+                fall_loc <= dig_loc;
+        end
+    end
+    
+    always @(*) begin
+        case(state)
+            L: begin
+                if (~ground)
+                    next_state = A;
+                else if (dig)
+                    next_state = D;
+                else if (bump_left)
+                    next_state = R;
+                else
+                    next_state = L;
+            end
+            R: begin
+                if (~ground)
+                    next_state = A;
+                else if (dig)
+                    next_state = D;
+                else if (bump_right)
+                    next_state = L;
+                else
+                    next_state = R;
+            end
+            D: begin
+                if (~ground)
+                    next_state = A;
+                else
+                    next_state = D;
+            end
+            A: begin
+                if (~ground)
+                    next_state = A;
+                else if (fall_loc == 1)
+                    next_state = L;
+                else
+                    next_state = R;
+            end
+            default next_state = A;
+        endcase
+    end
+                    
+    assign walk_left = state == L;
+    assign walk_right = state == R;
+    assign aaah = state == A;
+    assign digging  = state == D;
+                
+endmodule
+```
+
+### 寫法B:展開(6狀態,方向編進狀態名)
+```verilog
+module top_module(
+    input clk,
+    input areset,    // Freshly brainwashed Lemmings walk left.
+    input bump_left,
+    input bump_right,
+    input ground,
+    input dig,
+    output walk_left,
+    output walk_right,
+    output aaah,
+    output digging ); 
+	
+    localparam L = 0, R = 1, FL = 2, FR = 3, DL = 4, DR = 5;
+    reg [2:0] state, next_state;
+    
+    always @(posedge clk or posedge areset) begin
+        if (areset)
+            state <= L;
+        else
+            state <= next_state;
+    end
+    
+    always @(*) begin
+        case(state)
+            L: begin
+                if (~ground)
+                    next_state = FL;
+                else if (dig)
+                    next_state = DL;
+                else if (bump_left)
+                    next_state = R;
+                else
+                    next_state = L;
+            end
+            R: begin
+                if (~ground)
+                    next_state = FR;
+                else if (dig)
+                    next_state = DR;
+                else if (bump_right)
+                    next_state = L;
+                else
+                    next_state = R;
+            end
+            FL: begin
+                if (~ground)
+                    next_state = FL;
+                else
+                    next_state = L;
+            end
+            FR: begin
+                if (~ground)
+                    next_state = FR;
+                else
+                    next_state = R;
+            end
+            DL: begin
+                if (~ground)
+                    next_state = FL;
+                else
+                    next_state = DL;
+            end
+            DR: begin
+                if (~ground)
+                    next_state = FR;
+                else
+                    next_state = DR;
+            end
+            default next_state = L;
+        endcase
+    end
+                    
+    assign walk_left = state == L;
+    assign walk_right = state == R;
+    assign aaah = state == FL || state == FR;
+    assign digging  = state == DL || state == DR;
+                
+endmodule
+```
+
+---
+
+## Circuits - Sequemtial Logic - Finate State Machines - Design a Moore FSM
+<img width="1400" height="853" alt="image" src="https://github.com/user-attachments/assets/41aeddf3-715b-445e-a1a6-bd988b80b95d" />
+
+### 核心洞察:中間兩層要分 up/down
+- 最低(l)、最高(h):流量已固定(全開/全關),**不分方向**
+- 中間兩層(l12、l23):可能升上來或降下來 → Δfr 不同 → **各分 up/down**
+- → 2 + 2×2 = **6 狀態**
+
+### 狀態輸出表
+
+| state | fr1 | fr2 | fr3 | Δfr |
+|-------|-----|-----|-----|-----|
+| reset態(低很久) | 1 | 1 | 1 | 1 |
+| l (Below S1) | 1 | 1 | 1 | 0 |
+| l12_up | 1 | 1 | 0 | 0 |
+| l12_down | 1 | 1 | 0 | 1 |
+| l23_up | 1 | 0 | 0 | 0 |
+| l23_down | 1 | 0 | 0 | 1 |
+| h (Above S3) | 0 | 0 | 0 | 0 |
+
+### 兩種寫法(= 旅鼠的展開 vs 摺疊)
+- 方法一:4 狀態 + 方向 reg(摺疊)→ 狀態少,但易滑向 Mealy
+- **方法二:6 狀態**(方向編進狀態名)→ 純 Moore、好畫圖、**題目要 Moore 選這個**
+
+### Write your solution here
+```verilog
+module top_module (
+    input clk,
+    input reset,
+    input [3:1] s,
+    output fr3,
+    output fr2,
+    output fr1,
+    output dfr
+); 
+    parameter bot = 0, l12_up = 1, l12_down = 2, l23_up = 3, l23_down = 4, top = 5;
+    reg [2:0] state, next_state;
+    always @(posedge clk) begin
+        if (reset) begin
+            state <= bot;
+   		end
+        else
+            state <= next_state;
+    end
+    
+    always @(*) begin
+        case(state)
+            bot : begin
+                if (s == 3'b000)      next_state = bot;
+                else                  next_state = l12_up;
+            end
+            l12_up : begin
+                case(s)
+                    3'b011 : next_state = l23_up;
+                    3'b001 : next_state = l12_up;
+                    3'b000 : next_state = bot;
+                    default next_state = l12_up;
+                endcase
+            end
+            l12_down : begin
+                case(s)
+                    3'b011 : next_state = l23_up;
+                    3'b001 : next_state = l12_down;
+                    3'b000 : next_state = bot;
+                	default next_state = l12_down;
+                endcase
+            end
+            l23_up : begin
+                case(s)
+                    3'b111 : next_state = top;
+                    3'b011 : next_state = l23_up;
+                    3'b001 : next_state = l12_down;
+                    default next_state = l23_up;
+                endcase
+            end
+            l23_down : begin
+                case(s)
+                    3'b111 : next_state = top;
+                    3'b011 : next_state = l23_down;
+                    3'b001 : next_state = l12_down;
+                    default next_state = l23_down;
+                endcase
+            end
+            top : begin
+                if (s == 3'b111)      next_state = top;
+                else                  next_state = l23_down;
+            end
+        endcase
+    end
+    assign fr1 = (state != top);
+    assign fr2 = (state == bot) | (state == l12_up) | (state == l12_down);
+    assign fr3 = (state == bot);
+    assign dfr = (state == bot) | (state == l12_down) | (state == l23_down);
+
+endmodule
+```
+
+---
+
+## Circuits - Sequemtial Logic - Finate State Machines - Lemmings4
+<img width="1572" height="732" alt="image" src="https://github.com/user-attachments/assets/9d127a4a-0557-46d2-be2c-4f9be1d3bbf2" />
+
+### 新增:fall_clk(計掉落拍數) + splat 死狀態
+
+### 致命 bug:fall_clk 沒歸零
+跨多次掉落累加殘值 → 第二次掉落帶舊值繼續加 → 提早誤判摔死。
+- ❌ 只靠 areset:只顧開頭,顧不到「安全落地→再掉」的每次新掉落
+- ✅ **進入掉落那拍設 fall_clk=1**(每次掉落重數)
+
+### 其他重點
+- splat 死狀態:`next_state = 自己` **無條件**(寫條件多餘且藏 latch)
+- 門檻用 `5'd21` 不用 `5'h15`(真計數用十進位,hex 易看錯成 15)
+- ⚠️ `(state == DL || DR)` 是錯的(會變 state==R) → 要 `(state==DL || state==DR)`
+
+### 心法(跟封包接收器同一個坑)
+> **計數器要在「每次開始用之前」歸零,不能只靠 reset 顧開頭。**
+> 封包的 count、splat 的 fall_clk —— 都是「每次重新使用都要乾淨」。
+
+### Write your solution here
+### 寫法A:摺疊
+```verilog
+module top_module(
+    input clk,
+    input areset,    // Freshly brainwashed Lemmings walk left.
+    input bump_left,
+    input bump_right,
+    input ground,
+    input dig,
+    output walk_left,
+    output walk_right,
+    output aaah,
+    output digging ); 
+
+    localparam L = 0, R = 1, A = 2, D = 3, I = 4;
+    reg [2:0] state, next_state;
+    reg fall_loc, dig_loc;
+    reg [4:0] fall_clk;
+    
+    always @(posedge clk or posedge areset) begin
+        if (areset) begin
+            state <= L;
+            fall_clk <= 0;
+        end
+        else begin
+            state <= next_state;
+            if (state == L && ground && dig)
+                dig_loc <= 1;
+            if (state == L && ~ground) begin
+                fall_loc <= 1;
+                fall_clk <= 5'h1;
+            end
+            if (state == R && ground && dig)
+                dig_loc <= 0;
+            if (state == R && ~ground) begin
+                fall_loc <= 0;
+                fall_clk <= 5'h1;
+            end
+            if (state == D && ~ground) begin
+                fall_loc <= dig_loc;
+                fall_clk <= 5'h1;
+            end
+            if (state == A && ~ground && fall_clk != 5'h15)
+                fall_clk <= fall_clk + 5'h1;
+        end
+    end
+    
+    always @(*) begin
+        case(state)
+            L: begin
+                if (~ground)
+                    next_state = A;
+                else if (dig)
+                    next_state = D;
+                else if (bump_left)
+                    next_state = R;
+                else
+                    next_state = L;
+            end
+            R: begin
+                if (~ground)
+                    next_state = A;
+                else if (dig)
+                    next_state = D;
+                else if (bump_right)
+                    next_state = L;
+                else
+                    next_state = R;
+            end
+            D: begin
+                if (~ground)
+                    next_state = A;
+                else
+                    next_state = D;
+            end
+            A: begin
+                if (~ground)
+                    next_state = A;
+                else if (fall_clk == 5'h15)
+                    next_state = I;
+                else if (~fall_loc)
+                    next_state = R;
+                else
+                    next_state = L;
+            end
+            I: begin
+                next_state = I;
+            end
+            default next_state = L;
+        endcase
+    end
+    
+    assign walk_left = state == L;
+    assign walk_right = state == R;
+    assign aaah = state == A;
+    assign digging = state  == D;
+endmodule
+```
+
+### 寫法B:展開(6狀態,方向編進狀態名)
+```verilog
+module top_module(
+    input clk,
+    input areset,    // Freshly brainwashed Lemmings walk left.
+    input bump_left,
+    input bump_right,
+    input ground,
+    input dig,
+    output walk_left,
+    output walk_right,
+    output aaah,
+    output digging ); 
+
+    localparam L = 0, R = 1, FL = 2, FR = 3, DL = 4, DR = 5, S = 6;
+    reg [2:0] state, next_state;
+    reg [4:0] fall_clk;
+    
+    always @(posedge clk or posedge areset) begin
+        if (areset) begin
+            state <= L;
+            fall_clk <= 0;
+        end
+        else begin
+            state <= next_state;
+            if (state == L && ~ground)
+                fall_clk <= 5'd1;
+            if (state == R && ~ground)
+                fall_clk <= 5'd1;
+            if ((state == DL || state == DR) && ~ground)
+                fall_clk <= 5'd1;
+            if ((state == FL || state == FR) && ~ground && fall_clk != 5'd21)
+                fall_clk <= fall_clk + 5'd1;
+        end
+    end
+    
+    always @(*) begin
+        case(state)
+            L: begin
+                if (~ground)
+                    next_state = FL;
+                else if (dig)
+                    next_state = DL;
+                else if (bump_left)
+                    next_state = R;
+                else
+                    next_state = L;
+            end
+            R: begin
+                if (~ground)
+                    next_state = FR;
+                else if (dig)
+                    next_state = DR;
+                else if (bump_right)
+                    next_state = L;
+                else
+                    next_state = R;
+            end
+            FL: begin
+                if (~ground)
+                    next_state = FL;
+                else if (fall_clk == 5'd21)
+                    next_state = S;
+                else
+                    next_state = L;
+            end
+            FR: begin
+                if (~ground)
+                    next_state = FR;
+                else if (fall_clk == 5'd21)
+                    next_state = S;
+                else
+                    next_state = R;
+            end
+            DL: begin
+                if (~ground)
+                    next_state = FL;
+                else
+                    next_state = DL;
+            end
+            DR: begin
+                if (~ground)
+                    next_state = FR;
+                else
+                    next_state = DR;
+            end
+            S:
+				next_state = S;
+            default next_state = L;
+        endcase
+    end
+    
+    assign walk_left = state == L;
+    assign walk_right = state == R;
+    assign aaah = state == FL || state == FR;
+    assign digging = state  == DL || state == DR;
 endmodule
 ```
 
