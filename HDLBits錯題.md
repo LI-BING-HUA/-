@@ -1891,105 +1891,6 @@ endmodule
 
 ---
 
-## Circuits - Sequemtial Logic - Finate State Machines - Design a Moore FSM
-<img width="1400" height="853" alt="image" src="https://github.com/user-attachments/assets/41aeddf3-715b-445e-a1a6-bd988b80b95d" />
-
-### 核心洞察:中間兩層要分 up/down
-- 最低(l)、最高(h):流量已固定(全開/全關),**不分方向**
-- 中間兩層(l12、l23):可能升上來或降下來 → Δfr 不同 → **各分 up/down**
-- → 2 + 2×2 = **6 狀態**
-
-### 狀態輸出表
-
-| state | fr1 | fr2 | fr3 | Δfr |
-|-------|-----|-----|-----|-----|
-| reset態(低很久) | 1 | 1 | 1 | 1 |
-| l (Below S1) | 1 | 1 | 1 | 0 |
-| l12_up | 1 | 1 | 0 | 0 |
-| l12_down | 1 | 1 | 0 | 1 |
-| l23_up | 1 | 0 | 0 | 0 |
-| l23_down | 1 | 0 | 0 | 1 |
-| h (Above S3) | 0 | 0 | 0 | 0 |
-
-### 兩種寫法(= 旅鼠的展開 vs 摺疊)
-- 方法一:4 狀態 + 方向 reg(摺疊)→ 狀態少,但易滑向 Mealy
-- **方法二:6 狀態**(方向編進狀態名)→ 純 Moore、好畫圖、**題目要 Moore 選這個**
-
-### Write your solution here
-```verilog
-module top_module (
-    input clk,
-    input reset,
-    input [3:1] s,
-    output fr3,
-    output fr2,
-    output fr1,
-    output dfr
-); 
-    parameter bot = 0, l12_up = 1, l12_down = 2, l23_up = 3, l23_down = 4, top = 5;
-    reg [2:0] state, next_state;
-    always @(posedge clk) begin
-        if (reset) begin
-            state <= bot;
-   		end
-        else
-            state <= next_state;
-    end
-    
-    always @(*) begin
-        case(state)
-            bot : begin
-                if (s == 3'b000)      next_state = bot;
-                else                  next_state = l12_up;
-            end
-            l12_up : begin
-                case(s)
-                    3'b011 : next_state = l23_up;
-                    3'b001 : next_state = l12_up;
-                    3'b000 : next_state = bot;
-                    default next_state = l12_up;
-                endcase
-            end
-            l12_down : begin
-                case(s)
-                    3'b011 : next_state = l23_up;
-                    3'b001 : next_state = l12_down;
-                    3'b000 : next_state = bot;
-                	default next_state = l12_down;
-                endcase
-            end
-            l23_up : begin
-                case(s)
-                    3'b111 : next_state = top;
-                    3'b011 : next_state = l23_up;
-                    3'b001 : next_state = l12_down;
-                    default next_state = l23_up;
-                endcase
-            end
-            l23_down : begin
-                case(s)
-                    3'b111 : next_state = top;
-                    3'b011 : next_state = l23_down;
-                    3'b001 : next_state = l12_down;
-                    default next_state = l23_down;
-                endcase
-            end
-            top : begin
-                if (s == 3'b111)      next_state = top;
-                else                  next_state = l23_down;
-            end
-        endcase
-    end
-    assign fr1 = (state != top);
-    assign fr2 = (state == bot) | (state == l12_up) | (state == l12_down);
-    assign fr3 = (state == bot);
-    assign dfr = (state == bot) | (state == l12_down) | (state == l23_down);
-
-endmodule
-```
-
----
-
 ## Circuits - Sequemtial Logic - Finate State Machines - Lemmings4
 <img width="1572" height="732" alt="image" src="https://github.com/user-attachments/assets/9d127a4a-0557-46d2-be2c-4f9be1d3bbf2" />
 
@@ -2109,7 +2010,7 @@ module top_module(
 endmodule
 ```
 
-### 寫法B:展開(6狀態,方向編進狀態名)
+### 寫法B:展開
 ```verilog
 module top_module(
     input clk,
