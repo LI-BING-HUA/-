@@ -2118,7 +2118,14 @@ endmodule
 ## 串列封包接收器(Serial Receiver)
 
 ### 規格
-偵測標頭 `101` → 收 8 個 data bit(MSB 先) → 組成 byte,done 與 out_byte 同拍輸出 → 回去找下一個標頭。
+- **輸入**:`in`(序列 bit 流,每 clk 一個)、`clk`、同步 `reset`
+- **輸出**:`out_byte[7:0]`、`done`
+- **協定**:
+  1. 偵測標頭 `101`
+  2. 標頭後收 8 個 data bit,**MSB 先到**
+  3. 收到第 8 個 → `done` 拉高一拍,`out_byte` 同拍輸出完整 byte
+  4. done 後回去找下一個標頭
+  5. 同步 reset 回到找標頭狀態
 
 ### 狀態設計(A/B/C/D)
 | 狀態 | 意義 | 轉移 |
@@ -2130,18 +2137,10 @@ endmodule
 
 <img width="795" height="319" alt="image" src="https://github.com/user-attachments/assets/98052384-32ac-49ce-88c7-30a8d6703725" />
 
-### ⭐ 時序圖 state 標法(秒懂「為什麼讀到1當下還是A」)
-> 上升緣「讀 in 的當下」state 還是舊的(A),`state <= next_state` 是 `<=` → 算出的 B **晚一拍**才生效,所以「讀到1」在拍0(state=A)、「變成B」在拍1。next_state 是「下拍才生效」不是「這拍立刻變」,跟 count/out_byte 晚一拍同一個機制。
-
-<img width="1148" height="1050" alt="image" src="https://github.com/user-attachments/assets/6818eaa0-cb6f-40fe-a9dc-14f1cfd32b2d" />
+<img width="1320" height="1207" alt="image" src="https://github.com/user-attachments/assets/816375fd-95ec-469c-a138-537f18b076a0" />
 
 ### 清零時機(等價變換,兩種都對)
-- 做法A(穩):進 D 前清 → `state==C && in` 時 `count<=0`。每次用前重清,self-correcting。
-- 做法B(也對):離開 D 時清 → `state==D && count==8` 時 `count<=0`,靠 reset 顧開頭。實測連續封包也 ALL PASS。
-- 心法:**初始化計數器,在「開始用之前」清最防呆**;但靠「reset 開頭一定來」也能成立。
-
-### 為什麼 out_byte 用 assign 不用 always(差一拍問題)
-- 若改 `always` 裡 `out_byte <= shift_reg`(暫存器)→ **晚一拍**:done(組合)在 count==8 當拍就亮,但 `<=` 的值要等這個 clk 邊緣結束才生效,所以 done 亮那拍 out_byte 還是舊值 → mismatch。
+- 心法:**初始化計數器,在「開始用之前」清最防呆**
 
 ### Write your solution here
 ```verilog
@@ -2190,9 +2189,9 @@ end
 always @(posedge clk) begin
         if (reset)
             count     <= 0;
-        else if (state == C && in)
+        else if (state != D)
             count <= 0;
-        else if (state == D && count != 4'd8) begin
+        else if (count != 4'd8) begin
             count <= count + 1; 
             shift_reg <= {shift_reg[6:0], in};
         end
