@@ -2135,7 +2135,7 @@ endmodule
 | C | 已收到10,等1 | in=1→D(標頭101完成,count歸0), in=0→A |
 | D | 收8個資料bit | count 0→8;count==8→A |
 
-<img width="795" height="319" alt="image" src="https://github.com/user-attachments/assets/98052384-32ac-49ce-88c7-30a8d6703725" />
+<img width="2107" height="682" alt="image" src="https://github.com/user-attachments/assets/050d98e0-eb61-4226-a2cf-190c1f7ffbd4" />
 
 <img width="1320" height="1207" alt="image" src="https://github.com/user-attachments/assets/816375fd-95ec-469c-a138-537f18b076a0" />
 
