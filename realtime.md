@@ -231,7 +231,7 @@ u(k) = Kp·e(k) + Ki·Σe(n) + Kd·(e(k) - e(k-1))
 - U = 1/3 + 1/4 + 3/10 = 0.33 + 0.25 + 0.30 = **0.88**
 - H = LCM(3,4,10) = **60**
 - N = 60/3 + 60/4 + 60/10 = 20 + 15 + 6 = **41 jobs**
-<img width="1520" height="1280" alt="hyperperiod_job_count_p3_p4_p10" src="https://github.com/user-attachments/assets/aa809e23-7438-4892-933e-74c1cdf86fa8" />
+<img width="1520" height="1280" alt="hyperperiod_job_count_white_text" src="https://github.com/user-attachments/assets/74214e99-63be-47ce-ae91-2ceaee570160" />
 
 > 🆕 **補充（看圖記 N 和 U）**：把每個 job 畫成方塊（寬度 = 執行時間 e），攤在 0~60：
 > - **方塊「數量」= N**（20+15+6=41 個）；週期越短刻度越密、job 越多。
