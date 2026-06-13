@@ -218,19 +218,21 @@ u(k) = Kp·e(k) + Ki·Σe(n) + Kd·(e(k) - e(k-1))
 | H = LCM(p₁,p₂,...,pₙ) | Hyperperiod |
 | N = Σ(H/pᵢ) | Hyperperiod 內的 job 總數 |
 
+> 🆕「從 Φ 開始，每 p 做一次，每次最多做 e，要在 D 內做完」
+>
+> 📌 課本完整記法：(Φ, p, e, D)，如果 Φ=0 且 D=p 就省略 → 只寫 (p, e)。
+
+（例：(10, 3) 代表 phase 0、週期 10、執行 3、deadline 10）
+
 > 🆕 **補充（Task vs Job — 一定要分清楚）**：
 > - **Task = 規格/設定**（每隔 p 生一個、每個做 e），本身**不會被執行**。像「鬧鐘設定：每天 7 點響」。
 > - **Job = task 按週期生出來的一個個實體**，**真正被排程、被 CPU 跑的是 job**。像「今天 7 點響的那一次」。
-> - **算 U、H 用 task 的參數**（規格層，每週期都一樣）；**畫時間軸、EDF、frame 裡放的是 job**（執行層）。
-
-> 🆕 **補充（uᵢ = eᵢ/pᵢ 為什麼這樣算）**：因為每隔 pᵢ 來一個 job、每個做 eᵢ，所以「每段 pᵢ 裡有 eᵢ 在忙」→ 忙碌比例 = eᵢ/pᵢ。任務規律重複，看一個週期就代表全部。U = Σuᵢ 是因為大家共用一顆 CPU，比例要疊加 = CPU 總共多忙。**U > 1 → 一顆 CPU 鐵定做不完，直接判不可行（不用畫圖）**。
-
-> 🆕 **補充（Hyperperiod 是什麼）**：H = LCM(所有週期) = **所有任務同時回到起跑點的時間** = 排程「開始重複」的一格。因為每 H 就一模一樣重複，所以**只要排好/驗證好一個 H，整個系統就 OK**（投影片「幫助快速驗證」）。Ch5 的 cyclic schedule 表也只存一個 H。
 
 **範例：** 三個 tasks，週期 3、4、10，執行時間 1、1、3
 - U = 1/3 + 1/4 + 3/10 = 0.33 + 0.25 + 0.30 = **0.88**
 - H = LCM(3,4,10) = **60**
 - N = 60/3 + 60/4 + 60/10 = 20 + 15 + 6 = **41 jobs**
+<img width="1520" height="1280" alt="hyperperiod_job_count_white_text" src="https://github.com/user-attachments/assets/74214e99-63be-47ce-ae91-2ceaee570160" />
 
 > 🆕 **補充（看圖記 N 和 U）**：把每個 job 畫成方塊（寬度 = 執行時間 e），攤在 0~60：
 > - **方塊「數量」= N**（20+15+6=41 個）；週期越短刻度越密、job 越多。
@@ -255,17 +257,6 @@ u(k) = Kp·e(k) + Ki·Σe(n) + Kd·(e(k) - e(k-1))
 - **Precedence**：執行順序的強制約束
 - **Data dependency**：透過共享資料溝通，**不一定有 precedence 關係**
   - 例：導航 job（更新位置）和飛行管理 job（讀取位置）是 data dependency，非 precedence
-
-> 🆕 **補充（兩種圖長怎樣）**：
-> - **Precedence graph**：只有實線箭頭＝先後限制。圈是 job，Jᵢ→Jₖ 代表「Jᵢ 做完，Jₖ 才能開始」。
->
-> <img width="380" alt="precedence graph" src="https://github.com/user-attachments/assets/placeholder-precedence" />
->
-> - **Task graph**：是 **extended precedence graph**——一樣有實線先後箭頭，**再加上虛線的 data-dependency 邊**（共用資料、讀最新值、不用等）和其他應用資訊。
->
-> <img width="380" alt="task graph" src="https://github.com/user-attachments/assets/placeholder-taskgraph" />
->
-> **一句話**：Precedence graph = 只畫「要等」；Task graph = 再加「共用資料但不用等」的虛線（資訊更完整的版本）。
 
 ---
 
