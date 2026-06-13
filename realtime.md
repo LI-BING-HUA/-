@@ -103,14 +103,14 @@ u(k) = Kp·e(k) + Ki·Σe(n) + Kd·(e(k) - e(k-1))
 | **Tardiness** |  遲到了多少，max(0, 完成時間 - deadline)<br> 準時或提早完成 → Tardiness = 0<br> 超過 deadline 才完成 → Tardiness = 超過了多少 ms |
 | **Slack time** | deadline 前的剩餘空閒時間 |
 
-<img width="805" height="424" alt="image" src="https://github.com/user-attachments/assets/eb06cab8-b824-4cdc-8e25-3ce7b9e4..." />
+<img width="805" height="424" alt="image" src="https://github.com/user-attachments/assets/eb06cab8-b824-4cdc-8e25-3ce7b9e4..." /> 
 
 假設 CPU 同時有兩個 job 要跑：
 
 - J0 release: 20ms，execution time: 75ms  
 - J1 release: 50ms，execution time: 75ms ← 插進來了！
 時間軸：
-<img width="617" height="199" alt="image" src="https://github.com/user-attachments/assets/3cd564a7-bd95-4569-b87f-b7347dfa66d2" />
+<img width="617" height="199" alt="image" src="https://github.com/user-attachments/assets/3cd564a7-bd95-4569-b87f-b7347dfa66d2" /> 
 
 **J1 的計算：**
 - Release time = 50ms
@@ -232,7 +232,7 @@ u(k) = Kp·e(k) + Ki·Σe(n) + Kd·(e(k) - e(k-1))
 - U = 1/3 + 1/4 + 3/10 = 0.33 + 0.25 + 0.30 = **0.88**
 - H = LCM(3,4,10) = **60**
 - N = 60/3 + 60/4 + 60/10 = 20 + 15 + 6 = **41 jobs**
-<img width="1520" height="1280" alt="hyperperiod_job_count_white_text" src="https://github.com/user-attachments/assets/74214e99-63be-47ce-ae91-2ceaee570160" />
+<img width="1520" height="1280" alt="hyperperiod_job_count_white_text" src="https://github.com/user-attachments/assets/74214e99-63be-47ce-ae91-2ceaee570160" /> 
 
 > 🆕 **補充（看圖記 N 和 U）**：把每個 job 畫成方塊（寬度 = 執行時間 e），攤在 0~60：
 > - **方塊「數量」= N**（20+15+6=41 個）；週期越短刻度越密、job 越多。
@@ -262,11 +262,11 @@ u(k) = Kp·e(k) + Ki·Σe(n) + Kd·(e(k) - e(k-1))
 >
 > **Precedence graph**：只有實線箭頭＝先後限制。圈是 job，Jᵢ→Jₖ 代表「Jᵢ 做完，Jₖ 才能開始」。
 >
-> <img width="1520" height="1000" alt="precedence_graph_basic" src="https://github.com/user-attachments/assets/1409e4fa-c6d3-4bc8-b614-d330c7703ab7" />
+> <img width="1520" height="1000" alt="precedence_graph_basic" src="https://github.com/user-attachments/assets/1409e4fa-c6d3-4bc8-b614-d330c7703ab7" /> 
 >
 > **Task graph**：是 **extended precedence graph**——一樣有實線先後箭頭，**再加上虛線的 data-dependency 邊**（共用資料、讀最新值、不用等）與其他應用資訊。
 >
-> <img width="1520" height="1120" alt="task_graph_with_data_dependency" src="https://github.com/user-attachments/assets/d649930f-03ba-4d54-9df7-5205e97ea610" />
+> <img width="1520" height="1120" alt="task_graph_with_data_dependency" src="https://github.com/user-attachments/assets/d649930f-03ba-4d54-9df7-5205e97ea610" /> 
 >
 > **一句話**：Precedence graph = 只畫「要等」；Task graph = 再加「共用資料但不用等」的虛線（資訊更完整的版本）。
 
