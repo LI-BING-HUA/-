@@ -25,7 +25,7 @@ u(k) = Kp·e(k) + Ki·Σe(n) + Kd·(e(k) - e(k-1))
 - Kp：比例（Proportional）
 - Ki：積分（Integral）
 - Kd：微分（Derivative）
-
+ 
 **取樣週期 T 的選擇**
 
 | T 大小 | 優點 | 缺點 |
