@@ -258,6 +258,18 @@ u(k) = Kp·e(k) + Ki·Σe(n) + Kd·(e(k) - e(k-1))
 - **Data dependency**：透過共享資料溝通，**不一定有 precedence 關係**
   - 例：導航 job（更新位置）和飛行管理 job（讀取位置）是 data dependency，非 precedence
 
+> 🆕 **補充（兩種圖長怎樣）**
+>
+> **Precedence graph**：只有實線箭頭＝先後限制。圈是 job，Jᵢ→Jₖ 代表「Jᵢ 做完，Jₖ 才能開始」。
+>
+> <img width="1520" height="1000" alt="precedence_graph_basic" src="https://github.com/user-attachments/assets/1409e4fa-c6d3-4bc8-b614-d330c7703ab7" />
+>
+> **Task graph**：是 **extended precedence graph**——一樣有實線先後箭頭，**再加上虛線的 data-dependency 邊**（共用資料、讀最新值、不用等）與其他應用資訊。
+>
+> <img width="1520" height="1120" alt="task_graph_with_data_dependency" src="https://github.com/user-attachments/assets/d649930f-03ba-4d54-9df7-5205e97ea610" />
+>
+> **一句話**：Precedence graph = 只畫「要等」；Task graph = 再加「共用資料但不用等」的虛線（資訊更完整的版本）。
+
 ---
 
 ## 快速複習表
