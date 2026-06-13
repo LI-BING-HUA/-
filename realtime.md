@@ -36,6 +36,8 @@ u(k) = Kp·e(k) + Ki·Σe(n) + Kd·(e(k) - e(k-1))
 - 黃金比例：**10 ≤ R/T ≤ 20**（R = rise time）
 - R/T < 10 → 控制輸出震盪，系統不穩定
 
+> 🆕 **補充（為什麼大 T 會震盪）**：T 大 = 隔很久才量測+修正一次，系統反應慢半拍、容易「修正過頭」，狀態在目標值上下來回擺盪（如同每 3 秒才看一次路在開車 → 蛇行）。所以 T 要小到在 rise time 內至少取樣 10～20 次（R/T ≥ 10），否則不穩定。
+
 **Digital Controller 的三個假設（Summary 重點）**
 
 假設 1：感測器資料無雜訊
@@ -135,6 +137,11 @@ u(k) = Kp·e(k) + Ki·Σe(n) + Kd·(e(k) - e(k-1))
 | 驗證要求 | 需嚴格保證（Guaranteed） | 統計滿足即可（Best-effort） |
 | 例子 | 火車煞車、飛行控制 | 電話網路、多媒體串流 |
 
+> 🆕 **補充（Guaranteed vs Best-effort / Admission request）**：
+> - **Guaranteed（保證）**＝使用者要求時序品質一定要被保證 → timing constraint 是 **hard**。
+> - **Best-effort（盡力）**＝系統盡量做、但允許偶爾低於規格 → timing constraint 是 **soft**。
+> - 當應用程式要**新增一個 hard 任務**時，必須先送一個 **admission request（入場申請）** 給 scheduler；scheduler 檢查「加進來後大家還趕得上嗎」→ 趕得上才 **admit（接受）**，否則 **拒絕**。（老師手寫「Hard task 要先 pass」就是指這個；和 Ch5 偶發 job 的 **acceptance test** 是同一個概念。）
+
 **Usefulness 三種類型（Job A, B, C）**
 - Job A（Hard）：到 deadline 立刻掉到 0
 - Job B（Soft，陡降）：過 deadline 後快速遞減
@@ -142,6 +149,7 @@ u(k) = Kp·e(k) + Ki·Σe(n) + Kd·(e(k) - e(k-1))
 
 ### Hard Timing Constraint 的三種規格方式
 1. **Deterministic**：每次 deadline 都必須達成（如：每次 ≤ 50ms）
+   - 🆕 **補充（還有一種變體寫法）**：「連續五次中最多一次的 response time 可以超過 50ms」也是 deterministic（容許少數失誤，但仍是死規定、不用機率）。
 2. **Probabilistic**：以機率表達（如：P(response > 50ms) < 0.2）
 3. **Usefulness function**：以效用函數表達（如：usefulness ≥ 0.8）
 
@@ -155,6 +163,8 @@ u(k) = Kp·e(k) + Ki·Σe(n) + Kd·(e(k) - e(k-1))
 1. **Consistency**：確認 timing constraints 規格正確 ( 規格寫對了嗎？       → Consistency )
 2. **Feasibility**：確認每個元件在硬體/軟體資源下可行 ( 單個元件跑得完嗎？   → Feasibility  )
 3. **Schedulability**：確認整體系統行為符合 timing constraints ( 全部一起跑沒問題嗎？ → Schedulability )
+
+> 🆕 **補充（Scheduler 的「正確性」定義）**：一個 scheduler 是 **correct（正確）** 的，定義為——它**絕不在任何 job 的 release time 之前**就排它執行（每個 job 的開始時間都 ≥ 該 job 的 release time）。英文填空常考：A scheduler works correctly if it never schedules any job **before** its release time.
 
 ---
 
