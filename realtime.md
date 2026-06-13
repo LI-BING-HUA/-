@@ -287,3 +287,43 @@ u(k) = Kp·e(k) + Ki·Σe(n) + Kd·(e(k) - e(k-1))
 **結論**：週期模型用最壞情況抓 → 0.333；實際平均只用 0.2。多預留的 ≈0.13 常空著浪費 → 這就是題幹說的「periodic model 太不精準、造成處理器 underutilization（資源浪費）」。
 
 > 記法：**週期取最短間隔、執行取最長時間（都往最壞想）；保險值 3/9 比實際平均 2/10 高，差額 = 浪費。**
+
+### 🆕 練習題 3.2（把程式流程畫成 task / precedence graph）
+
+**題目**：一天作息的 pseudocode（job 名稱斜體）：start→breakfast→office；10AM 若有課→teach，否則→help；teach/help 完→lunch；睡到 2PM→sleep；若有 seminar（主題有趣→listen，否則→read），否則→write office；seminar 結束→social hour→discuss→jog→dinner→work more→endtheday。
+(a) 畫 task graph 表示 job 間相依。 (b) 用多張 precedence graph 表示所有可能路徑。
+
+**(a) Task graph（一張圖含所有分支）**
+
+<img width="1360" height="840" alt="daily_routine_task_graph" src="請貼上你截圖的網址" />
+
+- 必做主線：start→breakfast→office→…→lunch→sleep→…→social→discuss→jog→dinner→work more→end
+- 分支①（office 後）：**teach / help** 二選一 → 會合於 **lunch**
+- 分支②③（sleep 後）：**listen / read / write** 三選一 → 會合於 **social hour**
+- ⚠️ **write office → social hour 為題目未明寫的合理假設**（圖中以虛線表示）：因為最後有 `endtheday` 這個總終點，所有路徑都應能走到它，否則「沒 seminar」那天走不到結束。考試應在圖旁**註明此假設**。
+
+**(b) 需要幾張 precedence graph？**
+
+precedence graph 一張只能畫**一條確定路徑**（不能有 if/else 選擇）。分支組合數 = 張數：
+- 分支①：teach / help → 2 種
+- 分支②③：listen / read / write → 3 種
+- → **2 × 3 = 6 張**，每張都是一條直線（把分岔拿掉只留實走的那條）。
+
+> 一句話：**task graph 一張容得下所有 if/else 分岔；precedence graph 每張只能是走完的一條路 → 有幾種分支組合就畫幾張（這題 2×3=6）。**
+> 申論加分點：題目模糊（如 write 之後沒明寫）時，**主動寫出你的假設**，閱卷老師會知道你想清楚了。
+
+---
+
+## 快速複習表
+
+| 概念 | 核心重點 |
+|------|---------|
+| PID 公式 | u(k) = Kp·e(k) + Ki·Σe(n) + Kd·(e(k)-e(k-1)) |
+| 取樣週期黃金比例 | 10 ≤ R/T ≤ 20 |
+| Hard deadline | 沒趕上 = fatal，需嚴格驗證 |
+| Soft deadline | 沒趕上只是 undesirable，統計驗證 |
+| Tardiness | 完成時間 - deadline（準時完成 = 0）|
+| Utilization | uᵢ = eᵢ/pᵢ，總 U = Σuᵢ |
+| Hyperperiod | H = LCM(所有週期) |
+| Sporadic vs Aperiodic | Sporadic = Hard deadline；Aperiodic = Soft/無 deadline |
+| 驗證三步驟 | Consistency → Feasibility → Schedulability |
