@@ -295,7 +295,8 @@ u(k) = Kp·e(k) + Ki·Σe(n) + Kd·(e(k) - e(k-1))
 
 **(a) Task graph（一張圖含所有分支）**
 
-<img width="1360" height="840" alt="daily_routine_task_graph" src="請貼上你截圖的網址" />
+<img width="2720" height="1680" alt="daily_routine_task_graph_white_labels" src="https://github.com/user-attachments/assets/f0ab6cae-7661-41d7-86f8-194b8afdf455" />
+
 
 - 必做主線：start→breakfast→office→…→lunch→sleep→…→social→discuss→jog→dinner→work more→end
 - 分支①（office 後）：**teach / help** 二選一 → 會合於 **lunch**
