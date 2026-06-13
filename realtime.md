@@ -270,18 +270,20 @@ u(k) = Kp·e(k) + Ki·Σe(n) + Kd·(e(k) - e(k-1))
 >
 > **一句話**：Precedence graph = 只畫「要等」；Task graph = 再加「共用資料但不用等」的虛線（資訊更完整的版本）。
 
----
+### 🆕 練習題 3.1（用最壞情況把偶發流近似成週期任務）
 
-## 快速複習表
+**題目**：一串 sporadic job，到達間隔（interrelease time）均勻分布在 **9~11**，執行時間均勻分布在 **1~3**。
+(a) 若用一個週期任務來模型化，參數是多少？ (b) 比較它的 utilization 與偶發流的平均 utilization。
 
-| 概念 | 核心重點 |
-|------|---------|
-| PID 公式 | u(k) = Kp·e(k) + Ki·Σe(n) + Kd·(e(k)-e(k-1)) |
-| 取樣週期黃金比例 | 10 ≤ R/T ≤ 20 |
-| Hard deadline | 沒趕上 = fatal，需嚴格驗證 |
-| Soft deadline | 沒趕上只是 undesirable，統計驗證 |
-| Tardiness | 完成時間 - deadline（準時完成 = 0）|
-| Utilization | uᵢ = eᵢ/pᵢ，總 U = Σuᵢ |
-| Hyperperiod | H = LCM(所有週期) |
-| Sporadic vs Aperiodic | Sporadic = Hard deadline；Aperiodic = Soft/無 deadline |
-| 驗證三步驟 | Consistency → Feasibility → Schedulability |
+**(a) 取最壞情況** → 週期取「最短間隔」、執行取「最長時間」：
+- p = 最短間隔 = **9**
+- e = 最長執行 = **3**
+- → **T = (9, 3)**（D = p = 9）
+
+**(b) 比較 utilization：**
+- 週期模型（最壞）：u = e/p = 3/9 ≈ **0.333**
+- 偶發流平均：平均執行 (1+3)/2 = 2、平均間隔 (9+11)/2 = 10 → u = 2/10 = **0.2**
+
+**結論**：週期模型用最壞情況抓 → 0.333；實際平均只用 0.2。多預留的 ≈0.13 常空著浪費 → 這就是題幹說的「periodic model 太不精準、造成處理器 underutilization（資源浪費）」。
+
+> 記法：**週期取最短間隔、執行取最長時間（都往最壞想）；保險值 3/9 比實際平均 2/10 高，差額 = 浪費。**
