@@ -103,7 +103,6 @@ u(k) = Kp·e(k) + Ki·Σe(n) + Kd·(e(k) - e(k-1))
 | **Tardiness** |  遲到了多少，max(0, 完成時間 - deadline)<br> 準時或提早完成 → Tardiness = 0<br> 超過 deadline 才完成 → Tardiness = 超過了多少 ms |
 | **Slack time** | deadline 前的剩餘空閒時間 |
 
-<img width="805" height="424" alt="image" src="https://github.com/user-attachments/assets/eb06cab8-b824-4cdc-8e25-3ce7b9e4..." /> 
 
 假設 CPU 同時有兩個 job 要跑：
 
