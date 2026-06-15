@@ -573,3 +573,19 @@ P3:   -    C    E    H    -
 <img width="549" height="41" alt="image" src="https://github.com/user-attachments/assets/a8b7e072-ac96-40cd-9014-ba7aa1d67b40" />
 
 假设有可行排程 → 若违反 LST(该做 slack 小的却做了 slack 大的)→ swap 交换两者 → 因为 slack 小的提前不会 miss、slack 大的延后仍在 slack 内不会 miss → 反复 swap 变成 LST 排程且全程可行 → 故 LST 最佳。
+
+### 🆕 練習題 4.4（LST 多處理器不是最佳 — 反例本尊）⭐
+ 
+**題目**：5 個週期任務 A,B,C(p=2,e=1)、D,E(p=8,e=6)，phase 全 0、D=p，**3 個處理器**。
+(a) 證明用 LST 動態排程，有 job 會 miss。 (b) 找一個可行排程。 (c) 證明同 release 或同 deadline 時 LST 最佳。
+ 
+**先看負載**：H=LCM(2,8)=8；總工作量 = A,B,C 各跑4次×1 + D,E 各1次×6 = 12+12 = **24** = 3 處理器×8 → **剛好 100% 滿載，超緊**。
+ 
+**(a) LST 會 miss（重點！）**
+- t=0 slack：A,B,C = 2−0−1 = **1**（最小）；D,E = 8−0−6 = **2**
+- → LST 讓 slack 小的 **A,B,C 先佔滿 3 個處理器**，D、E 排不上
+- A,B,C 每 2 單位就回來搶一次 → **D、E 一直被冷落、切得太碎** → t=8 前做不完 6 單位 → **D 或 E miss** ❌
+- 結論：**LST 在多處理器不是最佳**。
+**(b) 可行排程**：存在，但**極難手排**（容量剛好滿載）。訣竅：利用 A,B,C「在自己週期內可挪時間」的彈性，錯開它們、空出格子讓 D、E 連續推進，且每個 job 一刻只在一個處理器（不可並行）。考試通常給排程讓你驗證，不會要你從零排。
+ 
+**(c) 一句話**：LST 只在「**單處理器**」或「**所有 job 同 release / 同 deadline**」時最佳；多處理器則不最佳。證明同 swap 套路（違反就交換，slack 小的提前不 miss、slack 大的延後仍在 slack 內）。
