@@ -607,5 +607,14 @@ P3:  D    E    D    E    E    E    E    E
 | 優先權 | **1 最先、9 最後**(i < k → Jᵢ 優先權高於 Jₖ) |
 | precedence | **J₉ 等 J₁**;**J₅~J₈ 等 J₄**;**J₂、J₃ 自由** |
 | 處理器 | 預設 **3 台**(只有 (d) 改 4 台) |
+<img width="2720" height="1680" alt="precedence_graph_9_jobs" src="https://github.com/user-attachments/assets/017904cd-368c-43de-b294-4039820181c3" />
 
 <img width="2720" height="1920" alt="gantt_b_c_d_e_schedules" src="https://github.com/user-attachments/assets/baa5f78b-3008-4222-9005-94bb1698599a" />
+**四題對照(看 J₉ 何時上車 → 何時完成)**
+ 
+| | 改了什麼 | J₉ 開始時間 | J₉ 完成 | 結果 |
+|--|---------|-----------|--------|------|
+| (b) | 原始 | t=3(剛好趕上) | 12 | ✅ |
+| (c) | 改可搶佔 | t=3 起跑但被搶佔 | 16 | ❌ |
+| (d) | 加到 4 台 | t=6 | 15 | ❌ |
+| (e) | 每個 e −1 | t=5 | 13 | ❌ |
