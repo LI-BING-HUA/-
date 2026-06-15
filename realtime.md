@@ -717,7 +717,7 @@ P3:  D    E    D    E    E    E    E    E
 - **離線**為硬 deadline 的工作建一張靜態排程表,執行時靠 timer 在預定時間點切換工作。
 - 因為離線算,**可以花大把時間用很複雜的演算法找最佳表**,run-time 不花成本。
 - 週期性的靜態排程 = **cyclic schedule(循環排程)**;表只需存**一個 hyperperiod H** 的內容,之後重複。
-- 表項 `(tₖ, T(tₖ))`:時間 tₖ 要跑哪個工作(`I` = idle 閒置)。
+- static timer-driven 的缺點:ad hoc 表沒結構、難維護 → 這正是後面要引入 frame(5.3)的動機。
 
 ---
 
