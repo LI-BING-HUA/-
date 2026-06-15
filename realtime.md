@@ -695,3 +695,114 @@ P3:  D    E    D    E    E    E    E    E
 | J₅ | max(1,3)=**3** | 8 |
 | J₆ | 4 | 20 |
 | J₇ | 6 | 21 |
+
+## Ch5:Clock-Driven Scheduling(時鐘驅動排程)
+
+> 一句話定位:**所有工作參數事先已知 → 離線把排程算好存成表 → 執行時時間到照表做**。負擔最小、最確定,但最死板。本章兩大考點:**① frame size 三條件(會算)② sporadic 的 acceptance test**。
+
+---
+
+### 5.1 名詞與假設
+
+**週期任務四元組**:`Tᵢ = (φᵢ, pᵢ, eᵢ, Dᵢ)` = (phase 相位, period 週期, execution 執行時間, relative deadline)
+- 預設值可省略:**φ=0、D=p**。所以 `(10, 3)` = phase 0、週期 10、執行 3、deadline 10;`(10, 3, 6)` = deadline 6。
+- 例:`(1, 10, 3, 6)` → 第一個 job 在 t=1 釋放、t=7 前要做完;第二個 t=11 釋放、t=17 前完成…每個最多跑 3、utilization = 3/10 = 0.3。
+
+**前提**:工作大多是**週期性、參數離線全知**;另有 aperiodic(隨機、軟)和 sporadic(隨機、**硬**)工作要另外塞。
+
+---
+
+### 5.2 靜態排程器(static timer-driven)
+
+- **離線**為硬 deadline 的工作建一張靜態排程表,執行時靠 timer 在預定時間點切換工作。
+- 因為離線算,**可以花大把時間用很複雜的演算法找最佳表**,run-time 不花成本。
+- 週期性的靜態排程 = **cyclic schedule(循環排程)**;表只需存**一個 hyperperiod H** 的內容,之後重複。
+- 表項 `(tₖ, T(tₖ))`:時間 tₖ 要跑哪個工作(`I` = idle 閒置)。
+
+---
+
+### 5.3 Cyclic schedule 的結構 ⭐(本章最重要)
+
+**Frame(框)與 Major cycle**
+- 排程決策只在**每個 frame 開頭**做 → **frame 內不搶佔(no preemption)**。
+- frame 長度 = **f(frame size)**;一個 hyperperiod = 若干個 frame = 一個 major cycle。
+
+#### 🎯 Frame Size 三條件(5.1)(5.2)(5.3)— 必考會算
+
+| 條件 | 式子 | 白話 / 理由 |
+|--|--|--|
+| **(5.1)** | **f ≥ max(eᵢ)** | frame 要塞得下任一工作 → frame 內不必搶佔 |
+| **(5.2)** | **f 整除 H**(等價:f 整除至少一個 pᵢ) | 每個 hyperperiod 剛好切成整數個 frame |
+| **(5.3)** | **2f − gcd(pᵢ, f) ≤ Dᵢ**(對每個任務) | 釋放與 deadline 間至少夾得下一個完整 frame,排程器才驗得了 deadline |
+
+> (5.3) 怎麼來:job 釋放點 t′ 與 frame 起點 t 的差 `t′−t ≥ gcd(pᵢ, f)`;最壞要 `2f −(t′−t) ≤ Dᵢ` → 代最壞 t′−t = gcd → **2f − gcd(pᵢ,f) ≤ Dᵢ**。(特例 t′=t 時 → 2f ≤ Dᵢ,已被涵蓋。)
+
+**算法 SOP**:① (5.1) 取 f 下限 → ② 列 H 的因數當候選 f → ③ 每個候選代 (5.3) 篩掉 → 剩下的就是合法 frame size。
+
+**範例 A(Figure 5-1)**:T1(4,1)、T2(5,1.8)、T3(20,1)、T4(20,2)
+- (5.1):f ≥ max(1,1.8,1,2) = **2**
+- (5.2):H = LCM(4,5,20,20) = 20 → 因數候選 {2,4,5,10,20}
+- (5.3):逐一代 `2f − gcd(pᵢ,f) ≤ Dᵢ` → **只有 f=2 過** → 選 **f = 2**
+
+**範例 B**:(15,1,14)、(20,2,26)、(22,3)
+- (5.1):f ≥ 3;(5.2):H = LCM(15,20,22)=660 → 候選 {3,4,5,10,11,15,20,22};(5.3):剩 **f = 3、4、5**
+
+#### 5.3.3 Job Slices(切片)— 當三條件喬不攏
+
+有時 (5.1) 要 f 大、(5.3) 要 f 小 → **互相矛盾、無解**。解法:把**執行時間大的工作切成小段(slice / subjob)**,降低 (5.1) 的下限。
+
+**範例**:T = {(4,1)、(5,2,7)、(20,5)}
+- (5.1) 要 f ≥ 5,但 (5.3) 要 f ≤ 4 → **矛盾**。
+- 把 (20,5) 切成 **三段 chain:(20,1)(20,3)(20,1)** → max e 降到 3,f ≥ 3,可選 **f = 4** ✅
+- ⚠️ 為何不切成兩段 (20,3)(20,2)?因為 f=4、5 個 frame 下:T1(p4)每個 frame 都要佔 1、T2(p5,e2)要佔 4 個 frame 各 2 → 多數 frame 只剩 **1 單位** 給 T3,塞不下 e=2 的段,只塞得下 e=1 的段 → 所以得切成 1/3/1。
+
+**建表三決策**(互相牽連):**選 frame size、切 slice、把 slice 放進 frame**。切越多段 → context switch 開銷越大 → **能少切就少切**;但有時為了塞得進去,被迫切更多段。
+
+---
+
+### 5.4 Cyclic Executive(循環執行器)
+
+把 clock-driven 排程器實作成 cyclic executive:每個 frame 開頭被 timer 喚醒 → ① **檢查 overrun**(上個 frame 的工作有沒有爆時間)→ ② 照表跑這個 frame 的 slice → ③ 剩下的 slack 跑 aperiodic。
+
+---
+
+### 5.5 改善 aperiodic 的平均反應時間
+
+**背景排程(背景做)**:aperiodic 等所有硬性 slice 做完才在背景跑 → 反應慢、又沒必要(硬 deadline 提早做完沒好處)。
+
+**🎯 Slack stealing(偷閒置時間)**:讓 aperiodic **搶在週期工作前面**,用該 frame 的 slack 先做。
+- 一個 frame 的 slack = **f − xₖ**(xₖ = 該 frame 已分配給 slice 的時間)。
+- 在 slack 內讓 aperiodic 先跑,**不會害任何硬 deadline miss**,卻能大幅縮短 aperiodic 反應時間。
+- 課本例:平均反應時間從背景的 4.5 降到 slack stealing 的 **2.5**。
+
+> 平均反應時間理論:`1−U` = 處理器空閒(可給 aperiodic)的比例 = **bandwidth**;U 越高、aperiodic 排隊越久。精確值通常要模擬。
+
+---
+
+### 5.6 排程 Sporadic 工作 ⭐(第二大考點)
+
+sporadic = **硬 deadline,但隨機釋放**。不能事先排進表,所以用**接收測試**動態決定收不收。
+
+#### 5.6.1 Acceptance Test(接收測試)
+- 每當一個 sporadic job 釋放,排程器測:**把它和系統現有工作一起排,能不能不害任何人 miss?**
+- 能 → **accept 並排入**;不能 → **立刻 reject**。
+- 為何立刻拒?→ 讓應用程式**及早做 recovery**,而不是拖到 miss 才知道。
+
+**測試式**:job `S(d, e)`,deadline 落在 frame `l+1`(frame l 結束在 d 之前)。則它必須在第 l 個 frame 前做完 →
+> **若 e > σc(t, l) 就拒絕**;σc(t,l) = frame t 到 l 之間目前的總 slack。
+
+#### 5.6.2 用 EDF 排已接收的 sporadic
+- 已接收的 sporadic 工作維持一個**依 deadline 由小到大排序的佇列**,週期 slice 做完後在 slack 裡按 EDF 跑。
+- ⚠️ 收新 job 可能讓已收的舊 job slack 變不夠 → 測試時要連帶確認舊 job 不會因此 miss。
+
+#### 5.6.4 Cyclic EDF 的最佳性
+- **在「frame 開頭做接收測試」這類演算法中,cyclic EDF 是最佳的**(由 EDF Theorem 4.1 推得):只要這類演算法排得成,EDF 一定排得成。
+- **但對「任意時刻都能測」的中斷驅動排程器就不是最佳**:Fig 5-11——若在 t=3(job 釋放當下)就中斷測試,能多撿到 frame 內 0.5 單位 slack 而接收 S1;cyclic EDF 等到 frame 開頭 t=4 才測 → 那 0.5 被浪費 → S1 被拒。
+
+---
+
+### 一句話總整理(5.1~5.6)
+
+> **Clock-driven = 離線把週期工作排成 cyclic schedule(滿足 frame 三條件 5.1/5.2/5.3,喬不攏就切 slice),存表照做。aperiodic 用 slack stealing 撿空檔提早做;sporadic 是硬 deadline 但隨機 → 用 acceptance test(e > σc 就拒)+ EDF 排已收的(cyclic EDF 在 frame 開頭測這類演算法中最佳,輸給任意時刻測的中斷式)。**
+
+> 考試重心:**① 會算 frame size 三條件 + 切 slice;② sporadic 的 acceptance test 邏輯。** 其餘為觀念。
