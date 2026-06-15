@@ -777,9 +777,7 @@ P3:  D    E    D    E    E    E    E    E
 **🎯 Slack stealing(偷閒置時間)**:讓 aperiodic **搶在週期工作前面**,用該 frame 的 slack 先做。
 - 一個 frame 的 slack = **f − xₖ**(xₖ = 該 frame 已分配給 slice 的時間)。
 - 在 slack 內讓 aperiodic 先跑,**不會害任何硬 deadline miss**,卻能大幅縮短 aperiodic 反應時間。
-- 課本例:平均反應時間從背景的 4.5 降到 slack stealing 的 **2.5**。
-
-> 平均反應時間理論:`1−U` = 處理器空閒(可給 aperiodic)的比例 = **bandwidth**;U 越高、aperiodic 排隊越久。精確值通常要模擬。
+- 週期性工作提早做完沒好處，但aperiodic有好處，所以可以把slack提前讓aperiodic先跑。
 
 ---
 
