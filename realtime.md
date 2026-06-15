@@ -568,3 +568,8 @@ P3:   -    C    E    H    -
       J1ₐ  J3   J1ᵦ  J1꜀
 ```
 > **完整答案**：Yes。因 execution time 為有理數，可找共同時間單位把每個 job 切成整數個等長小段（段間加順序），轉化成 (a) 的「等長 + precedence」問題，套 level (Hu's) algorithm。同一 job 的小段可分散排 → 即為可搶佔排程 → makespan 最佳。**關鍵：依賴 e 是有理數才切得出共同單位；無理數（如 √2）則不成立。**
+
+### 🆕 練習題 4.3
+<img width="549" height="41" alt="image" src="https://github.com/user-attachments/assets/a8b7e072-ac96-40cd-9014-ba7aa1d67b40" />
+
+假设有可行排程 → 若违反 LST(该做 slack 小的却做了 slack 大的)→ swap 交换两者 → 因为 slack 小的提前不会 miss、slack 大的延后仍在 slack 内不会 miss → 反复 swap 变成 LST 排程且全程可行 → 故 LST 最佳。
