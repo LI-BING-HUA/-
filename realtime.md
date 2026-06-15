@@ -525,3 +525,46 @@ J1 → J4 → J7 → J5 → J2 → J8 → J3 → J6 → J9
 - EDF：J1 J4 J2 J5 J3 J6 J7 J8 J9（看 deadline）
 - level：J1 J4 **J7 J5 J2 J8** J3 J6 J9（看路徑長度 → J7、J8 被提前）
 > 重點：**同一組 job、不同優先權指派 → 不同排程**。EDF 用有效時間＋忽略順序；level priority 用原始 release＋手動遵守順序（見上方 ⭐ 對照框）。同 level 時挑誰都算對。
+
+### 🆕 練習題 4.2（樹狀 precedence + 多處理器，Hu's / level algorithm）
+ 
+> ⚠️ 注意：這題的解法（Hu's algorithm）投影片**沒有**教，但用的就是 4.1(c) 的 **level priority 概念**，沒有真正新東西。若老師必考題沒圈可略過。
+ 
+**題目（Figure 4P-2）**：兩棵樹，所有 e=1、release 全相同，**3 個處理器**。
+樹1：A→B,C,D；B→E,F,G,H。 樹2：P→Q,R；Q→S；S→T。（共 13 個 job）
+(a) 給出讓「所有 job 完成時間最小」的**不可搶佔最佳排程**，並說明用的演算法。
+(b) 若 e 是任意有理數，演算法能否改成產生最佳「**可搶佔**」排程？
+
+<img width="499" height="200" alt="image" src="https://github.com/user-attachments/assets/0ab7dd38-a9b5-447b-9331-22040753a47f" />
+
+**(a) 解法：Hu's algorithm（= level / critical-path 排程）**
+ 
+step1 算 level（到最底葉子的最長路徑，含自己）：
+ 
+| level | jobs |
+|-------|------|
+| 4 | P |
+| 3 | A, Q |
+| 2 | B, S |
+| 1 | C,D,E,F,G,H,R,T |
+ 
+step2 每刻挑 ready 中 level 最高的（最多 3 個）上處理器：
+ 
+```
+時間: 0    1    2    3    4    5
+P1:   P    Q    S    F    R
+P2:   A    B    D    G    T
+P3:   -    C    E    H    -
+```
+ 
+**(b) 可以！把不等長 job 切成等長小段 → 變回 (a)**
+ 
+**例子**（1 處理器示範）：
+- J1: e=1.5；J3: e=0.5、release=0.5、deadline=1（急件）
+- 用 0.5 當共同單位 → J1 切成 3 段（J1ₐ J1ᵦ J1꜀），J3 = 1 段
+- 排小段（每刻挑最急）：
+```
+時間: 0    0.5  1    1.5  2
+      J1ₐ  J3   J1ᵦ  J1꜀
+```
+> **完整答案**：Yes。因 execution time 為有理數，可找共同時間單位把每個 job 切成整數個等長小段（段間加順序），轉化成 (a) 的「等長 + precedence」問題，套 level (Hu's) algorithm。同一 job 的小段可分散排 → 即為可搶佔排程 → makespan 最佳。**關鍵：依賴 e 是有理數才切得出共同單位；無理數（如 √2）則不成立。**
