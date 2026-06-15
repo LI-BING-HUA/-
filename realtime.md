@@ -609,10 +609,13 @@ P3:  D    E    D    E    E    E    E    E
 | 處理器 | 預設 **3 台**(只有 (d) 改 4 台) |
 
 **(a) Precedence graph**
-<img width="2720" height="1680" alt="precedence_graph_9_jobs" src="https://github.com/user-attachments/assets/017904cd-368c-43de-b294-4039820181c3" />
+
+<img width="2720" height="1680" alt="precedence_graph_9_jobs_white2" src="https://github.com/user-attachments/assets/a74edc15-1a6d-4238-ad0d-c81225120e97" />
 
 **(b)~(e)**
-<img width="2720" height="1920" alt="gantt_b_c_d_e_schedules" src="https://github.com/user-attachments/assets/baa5f78b-3008-4222-9005-94bb1698599a" />
+
+<img width="2720" height="1920" alt="gantt_b_c_d_e_schedules_white" src="https://github.com/user-attachments/assets/c8febca3-313e-4e57-8513-d2b87ed24970" />
+
 **四題對照(看 J₉ 何時上車 → 何時完成)**
  
 | | 改了什麼 | J₉ 開始時間 | J₉ 完成 | 結果 |
