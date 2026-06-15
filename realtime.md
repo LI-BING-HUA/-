@@ -595,3 +595,17 @@ P2:  B    D    B    D    B    D    B    D
 P3:  D    E    D    E    E    E    E    E
 ```
 **(c) 一句話**：LST 只在「**單處理器**」或「**所有 job 同 release / 同 deadline**」時最佳；多處理器則不最佳。證明同 swap 套路（違反就交換，slack 小的提前不 miss、slack 大的延後仍在 slack 內）。
+
+### 🆕 練習題 4.5（Graham 異常本尊 — 改條件看誰 miss）⭐
+**題目規格**
+ 
+| 項目 | 內容 |
+|------|------|
+| 9 個 job | J₁~J₉,**非搶佔(nonpreemptive)** |
+| 執行時間 e | 3, 2, 2, 2, 4, 4, 4, 4, **9** |
+| release / deadline | 全部 r = 0、d = **12** |
+| 優先權 | **1 最先、9 最後**(i < k → Jᵢ 優先權高於 Jₖ) |
+| precedence | **J₉ 等 J₁**;**J₅~J₈ 等 J₄**;**J₂、J₃ 自由** |
+| 處理器 | 預設 **3 台**(只有 (d) 改 4 台) |
+
+<img width="2720" height="1920" alt="gantt_b_c_d_e_schedules" src="https://github.com/user-attachments/assets/baa5f78b-3008-4222-9005-94bb1698599a" />
