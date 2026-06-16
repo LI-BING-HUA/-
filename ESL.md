@@ -66,5 +66,6 @@ LD（LDRB）= 2、ST（STRB）= 3、BNE = 2、**其他沒講到的 = 1**（CMP=1
 
 ## Reasons for Using TLM（使用 TLM 的理由）
 速度數字（易考陷阱）：**ESL（TLM）至少比 RTL 快 1000 倍，但不能比真正硬體慢超過 1000 倍**。意義 = 夠快能跑軟體、又夠早能用，用軟體來驗證硬體。
+
 <img width="407" height="229" alt="image" src="https://github.com/user-attachments/assets/2b92e2a8-f1b3-418d-a370-44bb97be40a3" />
 
