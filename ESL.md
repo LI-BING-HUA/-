@@ -69,3 +69,14 @@ LD（LDRB）= 2、ST（STRB）= 3、BNE = 2、**其他沒講到的 = 1**（CMP=1
 
 <img width="407" height="229" alt="image" src="https://github.com/user-attachments/assets/2b92e2a8-f1b3-418d-a370-44bb97be40a3" />
 
+## TLM Formulation – Component Basics
+| 組成 | 功能 | 細分 |
+|------|------|------|
+| **Data structure** | 元件記住的資料 | control register（控制暫存器）、state registers（狀態暫存器）、variables、constants |
+| **FSM with computational operations** | 行為/運算（大腦） | Mealy machine，每個 state 寫運算敘述；更新 data structure 但**不改 constants** |
+| **Port** | 資料溝通接口 | **Master**＝FSM 主動發出 bus transaction；**Slave**＝依收到的 transaction 讀/寫暫存器 |
+| **Interrupt** | 事件通知接口 | **Input**＝把 FSM 帶到特定 ISR state；**Output**＝FSM 透過它發出中斷 |
+ 
+記法：Master 主動發、Slave 被動收。
+<img width="859" height="522" alt="image" src="https://github.com/user-attachments/assets/9d2f1e1b-88e2-4293-8d55-da417f3cb278" />
+
