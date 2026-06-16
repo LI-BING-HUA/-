@@ -121,3 +121,12 @@ Development path: questioning the nature of mathematical reasoning and formal sy
 4. 產生ISR AP2藍色箭頭流程
 5. 然後RAM指向AP2
 6. 最後AP2再到LCD Disolay綠色箭頭
+
+## A Race Condition Bug
+<img width="367" height="247" alt="image" src="https://github.com/user-attachments/assets/9ec2b514-562d-450f-b76c-adea2a2e497d" />
+
+### Race Condition（事件順序 bug）
+- **Definition**: concurrent actions (ARM write, DSP read) access a shared resource (RAM); the result depends on their timing. When timing is not guaranteed, the reader gets stale/old data and fails.
+- **Conditions for it to happen**: shared resource + concurrency/multi-core + dependency (write-before-read) + lack of synchronization with delay → read happens before data actually arrives.
+- **ICM is the key**: ICM = inter-connect module bridging AHB0/AHB1. ARM's cross-core write to DSP must pass through ICM; the **ICM delay** makes the data arrive late, so DSP reads before the data is in place → reads old value → AP1→AP2 dependency broken (the ✕ on the Task Graph).
+- **Fix**: use synchronization to guarantee "write-arrived" before "read" (e.g., DSP reads only after the write-complete Interrupt; add a handshake/flag).
