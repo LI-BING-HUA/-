@@ -285,3 +285,15 @@ A: The simulator is invoked **on every clock cycle**.
 (d) Cycle accurate
 
 A: The execution time is accurate **to the end of each clock cycle**.
+
+**Q6 (a)**
+ 
+Q: What operations does a bus transaction perform? In other words, what is a bus transaction?
+ 
+A: Addressed data read and write.
+ 
+**Q6 (b)**
+ 
+Q: Describe, among all parties involved in executing a task, what 'synchronization' is (one or at most two sentences).
+ 
+A: Synchronization coordinates the timing and ordering of the concurrent parties executing a task, so that dependent operations (e.g., write-before-read) happen in the correct order and race conditions are avoided.
