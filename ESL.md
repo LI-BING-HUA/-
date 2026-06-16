@@ -110,3 +110,14 @@ Development path: questioning the nature of mathematical reasoning and formal sy
 ## Church-Turing Thesis
 <img width="439" height="184" alt="image" src="https://github.com/user-attachments/assets/97594f7b-2009-47e6-9227-fc4d536b7e25" />
 
+## A Multi-Core, Multi-Thread Application
+<img width="369" height="248" alt="image" src="https://github.com/user-attachments/assets/a42f4662-09dd-48f9-a403-3e306db45cd9" />
+
+順序是 : 
+
+1. USB綠色箭頭到API
+2. 然後API再進RAM綠色箭頭
+3. 接著OS從ARM把東西送到DSP Core
+4. 產生ISR AP2藍色箭頭流程
+5. 然後RAM指向AP2
+6. 最後AP2再到LCD Disolay綠色箭頭
