@@ -138,3 +138,6 @@ Development path: questioning the nature of mathematical reasoning and formal sy
 <img width="173" height="142" alt="image" src="https://github.com/user-attachments/assets/62c11f53-aab5-4b2b-bf73-3fe839b69fb6" />
 <img width="567" height="419" alt="image" src="https://github.com/user-attachments/assets/e3589aa6-89c3-41ca-b9b3-9095a280c8d0" />
 
+## Distributed Computing
+<img width="419" height="47" alt="image" src="https://github.com/user-attachments/assets/c1a2da68-8244-471f-b142-74b7bc7302d8" />
+
