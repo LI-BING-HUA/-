@@ -82,3 +82,6 @@ LD（LDRB）= 2、ST（STRB）= 3、BNE = 2、**其他沒講到的 = 1**（CMP=1
 
 ## Use Cases, Coding Styles and Mechanisms
 <img width="407" height="222" alt="image" src="https://github.com/user-attachments/assets/3b0c3c83-6d9b-43f0-8bc5-a26fe5bb9d85" />
+
+## TLM-2 Core Interfaces - Transport
+<img width="442" height="266" alt="image" src="https://github.com/user-attachments/assets/60b2e4f3-ce80-44c4-a8b1-d1aeed2c04ec" />
