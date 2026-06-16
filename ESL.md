@@ -164,5 +164,32 @@ How ESL solves it: ESL builds a golden model (the TLM / virtual platform) that e
 <img width="463" height="199" alt="image" src="https://github.com/user-attachments/assets/cfd68afb-1910-4ba3-a1f6-2dcd8d5681d7" />
 <img width="583" height="503" alt="image" src="https://github.com/user-attachments/assets/7d1bc906-2912-412e-b33e-161855a660a1" />
 
-## Synchronous Data Flow
-<img width="434" height="266" alt="image" src="https://github.com/user-attachments/assets/6799e854-8580-4ac6-891f-37b7386d68b5" />
+## Synchronous Data Flow (SDF)（計算題大戶）
+ <img width="434" height="266" alt="image" src="https://github.com/user-attachments/assets/6799e854-8580-4ac6-891f-37b7386d68b5" />
+### 定義
+- **SDF = KPN 的限制版**：每個 node 每次 firing 的 produce/consume 數量**固定** → 可**靜態排程（static scheduling）**。（KPN 不固定、不能靜態排程）
+- 圖：**Node(actor)=運算**，**Edge=FIFO queue**；每條 edge 有 **produce rate + consume rate**，可有 **initial data（初始 token，黑點）**。
+- 形式：3-tuple **(N, E, E_{p,c,i})**：N 節點、E 邊、p 生產率、c 消耗率、i 初始資料。
+### 1. 算每個 node fire 幾次（核心計算）
+每條 edge 收支平衡：**(來源 fire 次數 × produce) = (目的 fire 次數 × consume)**。
+解聯立方程式得每個 node 的 fire 次數。例：Y 形圖得 A:8、B:3、C:6、D:3、E:6（全平衡 = consistent）。
+ 
+### 2. Consistent vs Inconsistent
+- **Consistent**：存在 periodic schedule，跑完一輪所有 FIFO **回到初始狀態**（token 不殘留/不短缺）。例：**ABCC**（A1次B1次C2次）。
+- **Inconsistent**：找不到 periodic schedule，token 會累積（例：C fire 兩次後仍剩 1 token 消化不掉）→ no periodic schedule。
+### 3. Topology Matrix（判斷一致性的正式方法）
+- **列(row)=edge，行(column)=node**；元素 (i,j)=node j 每 fire 一次在 edge i 上放/拿幾個 token。
+- **produce 正、consume（輸入通道）負**。
+- 範例（A→B、A→C、B→C）：
+```
+        A    B    C
+A→B  [  1   -1    0 ]
+A→C  [  2    0   -1 ]
+B→C  [  0    2   -1 ]
+```
+ 
+### 4. Rank 判斷（必背規則）
+> **存在 periodic schedule 的必要條件：topology matrix 的 rank = s − 1**（s = 節點數）。
+- rank = s−1 → **consistent**（有週期排程）
+- rank = s（≠ s−1）→ **inconsistent**（無週期排程）
+- 例：3 節點，rank=2 → consistent；改權重使 rank=3>2 → inconsistent。
