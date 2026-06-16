@@ -126,11 +126,10 @@ Development path: questioning the nature of mathematical reasoning and formal sy
 <img width="367" height="247" alt="image" src="https://github.com/user-attachments/assets/9ec2b514-562d-450f-b76c-adea2a2e497d" />
 
 ### Race Condition（事件順序 bug）
-- **Definition**: concurrent actions (ARM write, DSP read) access a shared resource (RAM); the result depends on their timing. When timing is not guaranteed, the reader gets stale/old data and fails.
-- **Conditions for it to happen**: shared resource + concurrency/multi-core + dependency (write-before-read) + lack of synchronization with delay → read happens before data actually arrives.
-- **ICM is the key**: ICM = inter-connect module bridging AHB0/AHB1. ARM's cross-core write to DSP must pass through ICM; the **ICM delay** makes the data arrive late, so DSP reads before the data is in place → reads old value → AP1→AP2 dependency broken (the ✕ on the Task Graph).
-- **Fix**: use synchronization to guarantee "write-arrived" before "read" (e.g., DSP reads only after the write-complete Interrupt; add a handshake/flag).
-- Synchronization coordinates the timing and ordering of concurrent parties so that dependent operations happen in the correct order, preventing race conditions.
+- **Definition**: concurrent actions (ARM write, DSP read) share RAM; result depends on timing. No timing guarantee → reader gets stale data.
+- **Conditions for it to happen**: shared resource + concurrency + write-before-read dependency + no sync (with delay) → read happens before data arrives.
+- **ICM is the key**: ICM bridges AHB0/AHB1. ARM's cross-core write passes through ICM; its delay makes data arrive late, so DSP reads the old value → AP1→AP2 broken
+- **Fix**: synchronization guarantees write-arrived before read (e.g., DSP reads only after write-complete Interrupt, or a handshake/flag). Synchronization coordinates the timing/ordering of concurrent parties so dependent operations run in the correct order.
 
 ## Parallel Computing
 <img width="413" height="31" alt="image" src="https://github.com/user-attachments/assets/73e89478-a649-4e7f-8abe-4424363aec6e" />
