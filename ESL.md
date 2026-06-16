@@ -165,7 +165,8 @@ How ESL solves it: ESL builds a golden model (the TLM / virtual platform) that e
 <img width="583" height="503" alt="image" src="https://github.com/user-attachments/assets/7d1bc906-2912-412e-b33e-161855a660a1" />
 
 ## Synchronous Data Flow (SDF)（計算題大戶）
- <img width="434" height="266" alt="image" src="https://github.com/user-attachments/assets/6799e854-8580-4ac6-891f-37b7386d68b5" />
+<img width="434" height="266" alt="image" src="https://github.com/user-attachments/assets/6799e854-8580-4ac6-891f-37b7386d68b5" />
+
 ### 定義
 - **SDF = KPN 的限制版**：每個 node 每次 firing 的 produce/consume 數量**固定** → 可**靜態排程（static scheduling）**。（KPN 不固定、不能靜態排程）
 - 圖：**Node(actor)=運算**，**Edge=FIFO queue**；每條 edge 有 **produce rate + consume rate**，可有 **initial data（初始 token，黑點）**。
