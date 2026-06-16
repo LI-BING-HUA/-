@@ -157,7 +157,14 @@ Development path: questioning the nature of mathematical reasoning and formal sy
 ## System Design Flow
 <img width="407" height="238" alt="image" src="https://github.com/user-attachments/assets/4a9e48b9-1e50-4ae4-89ce-bf91a3d0925f" />
 
+### HW ↔ SW/FW 之間的雙箭頭
+Issue: HW and SW/FW implementation must be co-designed and constantly coordinated; in a traditional flow they're developed separately and only integrated late, so HW/SW partition and interface mismatches surface too late.
+
+How ESL solves it: ESL provides a shared virtual platform (TLM) so HW and SW can be developed in parallel and integrated/verified early, instead of waiting until the end.
+
+### 左邊那條藍色拱形大箭頭
 Issue: The arched arrow represents the problem of verifying that the final integrated system stays consistent with the original algorithm design. In a traditional flow you only find out after integration is complete, and drift is hard to trace back.
+
 How ESL solves it: ESL builds a golden model (the TLM / virtual platform) that exists from the algorithm stage onward. Because this model is ready early and fast enough, every later stage (architecture, HW/SW implementation, integration) can be checked against it, ensuring the result stays faithful to the original algorithm. The final integrated system can be validated directly against the golden model, so deviations are caught early instead of at the very end.
 
 ## Kahn Process Network
