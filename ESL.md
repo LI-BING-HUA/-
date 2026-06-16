@@ -245,3 +245,32 @@ A→C  [  1    0   -1 ]
 B→C  [  0    1   -2 ]
 ```
 3 節點，rank = 2 = 3−1 → 與 consistent 一致 ✓
+
+## 考古
+Q1
+Q: Moore's
+A: The number of transistors on a chip roughly doubles every 18 months…
+while the chip price remains the same
+
+Q2(a)
+Q: Given a Digital Signal Processing (DSP) application as an example, why we say at system design level we can accurately give a cycle accurate design spec?
+A: Because a DSP has a fixed sampling rate
+
+Q2(b)
+Q: Please discuss why low power design has to do with memory access analysis and how memory access analysis depends on data flow analysis.
+A: On data flow analysis, we use memory access. These occupy 80% in data flow, so we design low power system.
+
+Q3: Please explain the following terminologies in respect to Instruction Set Simulator (ISS):
+
+(a) Instruction accurate
+A: The ISS executes instructions in the correct order with correct data to produce correct results, but gives **no timing information at all**.
+
+(b) Cycle count
+A: Each instruction is profiled with an execution latency in clock cycles, then in instruction-accurate order the execution times are **accumulated** to estimate total time.
+
+(c) Cycle Callable
+A: The simulator is invoked **on every clock cycle**.
+
+(d) Cycle Accurate
+The execution time is accurate **to the end of each clock cycle**.
+
