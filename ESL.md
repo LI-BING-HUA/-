@@ -141,3 +141,5 @@ Development path: questioning the nature of mathematical reasoning and formal sy
 ## Distributed Computing
 <img width="419" height="47" alt="image" src="https://github.com/user-attachments/assets/c1a2da68-8244-471f-b142-74b7bc7302d8" />
 
+## Cheating Husbands Puzzle
+<img width="473" height="221" alt="image" src="https://github.com/user-attachments/assets/03e1c4e9-42a7-4f25-84be-6fceedd1aa1a" />
