@@ -297,3 +297,19 @@ A: Addressed data read and write.
 Q: Describe, among all parties involved in executing a task, what 'synchronization' is (one or at most two sentences).
  
 A: Synchronization coordinates the timing and ordering of the concurrent parties executing a task, so that dependent operations (e.g., write-before-read) happen in the correct order and race conditions are avoided.
+
+**Q7 (a)**
+ 
+Q: What is the issue represented by the double arrow between "HW implementation" and "SW/FW Implementation", and how does ESL solve it?
+
+A (Issue): HW and SW/FW implementation must be co-designed and constantly coordinated; in a traditional flow they're developed separately and only integrated late, so HW/SW partition and interface mismatches surface too late.
+ 
+A (How ESL solves it): ESL provides a shared virtual platform (TLM) so HW and SW can be developed in parallel and integrated/verified early, instead of waiting until the end.
+ 
+**Q7 (b)**
+ 
+Q: What is the issue represented by the arched arrow from "Algorithm Design & Analysis" down to "System Integration", and how does ESL solve it?
+
+A (Issue): The arched arrow represents the problem of verifying that the final integrated system stays consistent with the original algorithm design. In a traditional flow you only find out after integration is complete, and drift is hard to trace back.
+
+A (How ESL solves it): ESL builds a golden model (the TLM / virtual platform) that exists from the algorithm stage onward. Because this model is ready early and fast enough, every later stage (architecture, HW/SW implementation, integration) can be checked against it, ensuring the result stays faithful to the original algorithm. The final integrated system can be validated directly against the golden model, so deviations are caught early instead of at the very end.
