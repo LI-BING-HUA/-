@@ -80,3 +80,5 @@ LD（LDRB）= 2、ST（STRB）= 3、BNE = 2、**其他沒講到的 = 1**（CMP=1
 記法：Master 主動發、Slave 被動收。
 <img width="859" height="522" alt="image" src="https://github.com/user-attachments/assets/9d2f1e1b-88e2-4293-8d55-da417f3cb278" />
 
+## Use Cases, Coding Styles and Mechanisms
+<img width="407" height="222" alt="image" src="https://github.com/user-attachments/assets/3b0c3c83-6d9b-43f0-8bc5-a26fe5bb9d85" />
