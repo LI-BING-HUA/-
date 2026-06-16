@@ -143,3 +143,19 @@ Development path: questioning the nature of mathematical reasoning and formal sy
 
 ## Cheating Husbands Puzzle
 <img width="473" height="221" alt="image" src="https://github.com/user-attachments/assets/03e1c4e9-42a7-4f25-84be-6fceedd1aa1a" />
+
+## Before ESL Verification
+<img width="456" height="196" alt="image" src="https://github.com/user-attachments/assets/dc491619-f41d-4a23-9a4d-80c4a28bcf53" />
+
+## System Design Complexity II
+<img width="1411" height="754" alt="image" src="https://github.com/user-attachments/assets/b8d97752-30d7-4f13-b57c-812ae3012803" />
+<img width="871" height="825" alt="image" src="https://github.com/user-attachments/assets/5da6a717-c08f-46c0-a9b9-d9b94ddfcaa6" />
+
+## Quick Review2-Way Set Associative Cache
+<img width="472" height="290" alt="image" src="https://github.com/user-attachments/assets/60dcad22-96d3-4b3e-bd2e-c7b291951563" />
+
+## System Design Flow
+<img width="407" height="238" alt="image" src="https://github.com/user-attachments/assets/4a9e48b9-1e50-4ae4-89ce-bf91a3d0925f" />
+
+Issue: The arched arrow represents the problem of verifying that the final integrated system stays consistent with the original algorithm design. In a traditional flow you only find out after integration is complete, and drift is hard to trace back.
+How ESL solves it: ESL builds a golden model (the TLM / virtual platform) that exists from the algorithm stage onward. Because this model is ready early and fast enough, every later stage (architecture, HW/SW implementation, integration) can be checked against it, ensuring the result stays faithful to the original algorithm. The final integrated system can be validated directly against the golden model, so deviations are caught early instead of at the very end.
