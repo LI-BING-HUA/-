@@ -134,3 +134,7 @@ Development path: questioning the nature of mathematical reasoning and formal sy
 ## Parallel Computing
 <img width="413" height="31" alt="image" src="https://github.com/user-attachments/assets/73e89478-a649-4e7f-8abe-4424363aec6e" />
 
+## Example Parallel Architectures
+<img width="173" height="142" alt="image" src="https://github.com/user-attachments/assets/62c11f53-aab5-4b2b-bf73-3fe839b69fb6" />
+<img width="567" height="419" alt="image" src="https://github.com/user-attachments/assets/e3589aa6-89c3-41ca-b9b3-9095a280c8d0" />
+
