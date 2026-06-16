@@ -59,3 +59,7 @@ LD（LDRB）= 2、ST（STRB）= 3、BNE = 2、**其他沒講到的 = 1**（CMP=1
 (2+1+1+2) + (2+1+1+1) + (2+1+1+2) + 1 = 6+5+6+1 = 18
 ```
 → **18 cycles**
+
+## What Is A Transaction?（transaction 的定義與階層）
+### 一句話總結（考點）
+**Bus transaction = addressed data read/write，是最基本的溝通單位；多個 bus transaction 可階層式組合成更高層的 task，故 transaction 是 hierarchical。**
