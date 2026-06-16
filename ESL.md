@@ -159,3 +159,10 @@ Development path: questioning the nature of mathematical reasoning and formal sy
 
 Issue: The arched arrow represents the problem of verifying that the final integrated system stays consistent with the original algorithm design. In a traditional flow you only find out after integration is complete, and drift is hard to trace back.
 How ESL solves it: ESL builds a golden model (the TLM / virtual platform) that exists from the algorithm stage onward. Because this model is ready early and fast enough, every later stage (architecture, HW/SW implementation, integration) can be checked against it, ensuring the result stays faithful to the original algorithm. The final integrated system can be validated directly against the golden model, so deviations are caught early instead of at the very end.
+
+## Kahn Process Network
+<img width="463" height="199" alt="image" src="https://github.com/user-attachments/assets/cfd68afb-1910-4ba3-a1f6-2dcd8d5681d7" />
+<img width="583" height="503" alt="image" src="https://github.com/user-attachments/assets/7d1bc906-2912-412e-b33e-161855a660a1" />
+
+## Synchronous Data Flow
+<img width="434" height="266" alt="image" src="https://github.com/user-attachments/assets/6799e854-8580-4ac6-891f-37b7386d68b5" />
