@@ -85,3 +85,7 @@ LD（LDRB）= 2、ST（STRB）= 3、BNE = 2、**其他沒講到的 = 1**（CMP=1
 
 ## TLM-2 Core Interfaces - Transport
 <img width="442" height="266" alt="image" src="https://github.com/user-attachments/assets/60b2e4f3-ce80-44c4-a8b1-d1aeed2c04ec" />
+
+## Model of Computation
+<img width="419" height="176" alt="image" src="https://github.com/user-attachments/assets/e5d21f89-30f3-4dc2-a94d-ab3da8ffbf3a" />
+
