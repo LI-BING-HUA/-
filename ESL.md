@@ -106,3 +106,7 @@ MoC seeks to understand three things:
 Origin: scientists have tried to build a machine to automate mathematical computing since the early 20th century.
 
 Development path: questioning the nature of mathematical reasoning and formal systems → breakthroughs in logic + design of abstract machines → modern computational complexity theory.
+
+## Church-Turing Thesis
+<img width="439" height="184" alt="image" src="https://github.com/user-attachments/assets/97594f7b-2009-47e6-9227-fc4d536b7e25" />
+
