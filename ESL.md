@@ -151,7 +151,7 @@ Development path: questioning the nature of mathematical reasoning and formal sy
 <img width="1411" height="754" alt="image" src="https://github.com/user-attachments/assets/b8d97752-30d7-4f13-b57c-812ae3012803" />
 <img width="871" height="825" alt="image" src="https://github.com/user-attachments/assets/5da6a717-c08f-46c0-a9b9-d9b94ddfcaa6" />
 
-## Quick Review2-Way Set Associative Cache
+## Quick Review 2-Way Set Associative Cache
 <img width="472" height="290" alt="image" src="https://github.com/user-attachments/assets/60dcad22-96d3-4b3e-bd2e-c7b291951563" />
 
 ## System Design Flow
