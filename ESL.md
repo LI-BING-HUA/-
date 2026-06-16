@@ -130,3 +130,7 @@ Development path: questioning the nature of mathematical reasoning and formal sy
 - **Conditions for it to happen**: shared resource + concurrency/multi-core + dependency (write-before-read) + lack of synchronization with delay → read happens before data actually arrives.
 - **ICM is the key**: ICM = inter-connect module bridging AHB0/AHB1. ARM's cross-core write to DSP must pass through ICM; the **ICM delay** makes the data arrive late, so DSP reads before the data is in place → reads old value → AP1→AP2 dependency broken (the ✕ on the Task Graph).
 - **Fix**: use synchronization to guarantee "write-arrived" before "read" (e.g., DSP reads only after the write-complete Interrupt; add a handshake/flag).
+
+## Parallel Computing
+<img width="413" height="31" alt="image" src="https://github.com/user-attachments/assets/73e89478-a649-4e7f-8abe-4424363aec6e" />
+
