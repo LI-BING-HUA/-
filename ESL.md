@@ -88,4 +88,20 @@ LD（LDRB）= 2、ST（STRB）= 3、BNE = 2、**其他沒講到的 = 1**（CMP=1
 
 ## Model of Computation
 <img width="419" height="176" alt="image" src="https://github.com/user-attachments/assets/e5d21f89-30f3-4dc2-a94d-ab3da8ffbf3a" />
+Core Points
 
+MoC (Model of Computation) = the mathematical foundation of computing devices.
+
+MoC is also called the Theory of Computation — this "alias" is the most common true/false trap.
+
+MoC seeks to understand three things: 
+
+(1) what problems computers can solve, 
+
+(2) how efficiently they can be solved, and 
+
+(3) the inherent limitations of computation.
+
+Origin: scientists have tried to build a machine to automate mathematical computing since the early 20th century.
+
+Development path: questioning the nature of mathematical reasoning and formal systems → breakthroughs in logic + design of abstract machines → modern computational complexity theory.
