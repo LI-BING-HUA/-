@@ -63,3 +63,8 @@ LD（LDRB）= 2、ST（STRB）= 3、BNE = 2、**其他沒講到的 = 1**（CMP=1
 ## What Is A Transaction?（transaction 的定義與階層）
 ### 一句話總結（考點）
 **Bus transaction = addressed data read/write，是最基本的溝通單位；多個 bus transaction 可階層式組合成更高層的 task，故 transaction 是 hierarchical。**
+
+## Reasons for Using TLM（使用 TLM 的理由）
+速度數字（易考陷阱）：**ESL（TLM）至少比 RTL 快 1000 倍，但不能比真正硬體慢超過 1000 倍**。意義 = 夠快能跑軟體、又夠早能用，用軟體來驗證硬體。
+<img width="407" height="229" alt="image" src="https://github.com/user-attachments/assets/2b92e2a8-f1b3-418d-a370-44bb97be40a3" />
+
