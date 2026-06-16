@@ -1,28 +1,8 @@
 # ESL重點
 
-## Moore's Law（經濟預測定律）
-
-The number of transistors on a chip roughly doubles every 18 months…
-
-while the chip price remains the same
-
 ## Traditional Abstract Levels
 
 <img width="407" height="223" alt="image" src="https://github.com/user-attachments/assets/2dcde310-4e4b-4f1f-9b37-44a82015b54b" />
-
-## Terminology…
-
-### 1. Instruction Accurate Simulation（指令精確）
-The ISS executes instructions in the correct order with correct data to produce correct results, but gives **no timing information at all**.
-
-### 2. Cycle Count Simulation（週期計數）
-Each instruction is profiled with an execution latency in clock cycles, then in instruction-accurate order the execution times are **accumulated** to estimate total time.
-
-### 3. Cycle Callable Simulation（可逐週期呼叫）
-The simulator is invoked **on every clock cycle**.
-
-### 4. Cycle Accurate Simulation（週期精確）
-The execution time is accurate **to the end of each clock cycle**.
 
 ## 計算範例：strcopy 迴圈的 Cycle Count vs Cycle Accurate
 ### 程式在做什麼（字串複製迴圈）
@@ -153,19 +133,6 @@ Development path: questioning the nature of mathematical reasoning and formal sy
 
 ## Quick Review 2-Way Set Associative Cache
 <img width="472" height="290" alt="image" src="https://github.com/user-attachments/assets/60dcad22-96d3-4b3e-bd2e-c7b291951563" />
-
-## System Design Flow
-<img width="407" height="238" alt="image" src="https://github.com/user-attachments/assets/4a9e48b9-1e50-4ae4-89ce-bf91a3d0925f" />
-
-### HW ↔ SW/FW 之間的雙箭頭
-Issue: HW and SW/FW implementation must be co-designed and constantly coordinated; in a traditional flow they're developed separately and only integrated late, so HW/SW partition and interface mismatches surface too late.
-
-How ESL solves it: ESL provides a shared virtual platform (TLM) so HW and SW can be developed in parallel and integrated/verified early, instead of waiting until the end.
-
-### 左邊那條藍色拱形大箭頭
-Issue: The arched arrow represents the problem of verifying that the final integrated system stays consistent with the original algorithm design. In a traditional flow you only find out after integration is complete, and drift is hard to trace back.
-
-How ESL solves it: ESL builds a golden model (the TLM / virtual platform) that exists from the algorithm stage onward. Because this model is ready early and fast enough, every later stage (architecture, HW/SW implementation, integration) can be checked against it, ensuring the result stays faithful to the original algorithm. The final integrated system can be validated directly against the golden model, so deviations are caught early instead of at the very end.
 
 ## Kahn Process Network
 <img width="463" height="199" alt="image" src="https://github.com/user-attachments/assets/cfd68afb-1910-4ba3-a1f6-2dcd8d5681d7" />
@@ -313,3 +280,4 @@ Q: What is the issue represented by the arched arrow from "Algorithm Design & An
 A (Issue): The arched arrow represents the problem of verifying that the final integrated system stays consistent with the original algorithm design. In a traditional flow you only find out after integration is complete, and drift is hard to trace back.
 
 A (How ESL solves it): ESL builds a golden model (the TLM / virtual platform) that exists from the algorithm stage onward. Because this model is ready early and fast enough, every later stage (architecture, HW/SW implementation, integration) can be checked against it, ensuring the result stays faithful to the original algorithm. The final integrated system can be validated directly against the golden model, so deviations are caught early instead of at the very end.
+<img width="407" height="238" alt="image" src="https://github.com/user-attachments/assets/4a9e48b9-1e50-4ae4-89ce-bf91a3d0925f" />
