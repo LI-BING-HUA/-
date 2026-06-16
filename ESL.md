@@ -194,3 +194,47 @@ B→C  [  0    2   -1 ]
 - rank = s−1 → **consistent**（有週期排程）
 - rank = s（≠ s−1）→ **inconsistent**（無週期排程）
 - 例：3 節點，rank=2 → consistent；改權重使 rank=3>2 → inconsistent。
+
+## SDF 練習題（含解答）
+ 
+判斷準則：每條 edge「來源 fire 次數 × produce = 目的 fire 次數 × consume」。
+解得出共同整數解（不矛盾）→ **consistent**；某 node 被要求 fire 不同次數（矛盾無解）→ **inconsistent**。
+（topology matrix：列=edge、行=node，produce 正、consume 負；consistent ⇔ rank = 節點數−1。row 上下順序不影響 rank，但每個數字的「位置+正負」要對。）
+ 
+### 第 1 題
+ 
+<img width="1360" height="360" alt="SDF_q1" src="https://github.com/user-attachments/assets/860c97c6-4d88-4f0b-9487-7852efede7e2" />
+
+方程式：A→B：`2·a = 3·b` → 最小整數解 **a=3, b=2**
+schedule = **A A B A B**（A 三次、B 兩次）→ **consistent**
+ 
+### 第 2 題
+ 
+<img width="1360" height="640" alt="SDF_q2" src="https://github.com/user-attachments/assets/93b8b225-5626-4ace-a42c-0962e504cf10" />
+
+邊：A→B(1/1)、A→C(3/1)、B→C(3/1)
+方程式：
+- A→B：`1·a = 1·b` → a=b
+- A→C：`3·a = 1·c` → c=3a
+- B→C：`3·b = 1·c` → c=3b（與上一致）
+最小解 **a=1, b=1, c=3** → schedule **A B C C C** → **consistent**
+ 
+### 第 3 題（有解但 B 要兩次 → 仍是 consistent）
+ 
+<img width="1360" height="640" alt="SDF_q3" src="https://github.com/user-attachments/assets/4a49f2bb-7652-4b27-b29e-1de988c6d469" />
+
+邊：A→B(2/1)、A→C(1/1)、B→C(1/2)
+方程式：
+- A→B：`2·a = 1·b` → b=2a
+- A→C：`1·a = 1·c` → c=a
+- B→C：`1·b = 2·c` → b=2c（與上一致：2a=2c, c=a ✓）
+最小解 **a=1, b=2, c=1** → schedule **A B B C** → **consistent**（⚠️ 易錯：B 要兩次很正常，有整數解就是 consistent，不是 inconsistent）
+ 
+Topology matrix：
+```
+        A    B    C
+A→B  [  2   -1    0 ]
+A→C  [  1    0   -1 ]
+B→C  [  0    1   -2 ]
+```
+3 節點，rank = 2 = 3−1 → 與 consistent 一致 ✓
