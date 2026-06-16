@@ -247,9 +247,9 @@ u(k) = Kp·e(k) + Ki·Σe(n) + Kd·(e(k) - e(k-1))
 | **Aperiodic** | 隨機 | Soft 或無 |
 
 ### Precedence Constraints
-- **Jᵢ < Jk**：Jᵢ 必須完成，Jk 才能開始執行
+- **Jᵢ < Jₖ**：Jᵢ 必須完成，Jₖ 才能開始執行
 - **Immediate predecessor**：中間沒有其他 job
-- **Independent jobs**：Jᵢ 和 Jk 互不影響
+- **Independent jobs**：Jᵢ 和 Jₖ 互不影響
 - 用 **Precedence graph**（有向圖 G = (J, <)）表示
 
 ### Data Dependency vs. Precedence
