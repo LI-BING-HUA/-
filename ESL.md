@@ -219,19 +219,19 @@ B→C  [  0    1   -2 ]
 
 Q: Moore's Law
 
-A: The number of transistors on a chip roughly doubles every 18 months, while the chip price remains the same.
+A: The number of transistors on a chip doubles every 18 months, while the chip price remains the same.
 
 **Q2 (a)**
 
 Q: Given a Digital Signal Processing (DSP) application as an example, why we say at system design level we can accurately give a cycle accurate design spec?
 
-A: Because a DSP has a fixed sampling rate.
+A: Because of fixed sampling rate.
 
 **Q2 (b)**
 
 Q: Please discuss why low power design has to do with memory access analysis and how memory access analysis depends on data flow analysis.
 
-A: On data flow analysis, we use memory access. These occupy 80% in data flow, so we design low power system.
+A: Memory access takes at least 80% of dynamic power; reducing memory access reduces power. The amount of memory access is decided by data flow analysis.
 
 **Q3**
 
@@ -239,45 +239,45 @@ Q: Please explain the following terminologies in respect to Instruction Set Simu
 
 (a) Instruction accurate
 
-A: The ISS executes instructions in the correct order with correct data to produce correct results, but gives **no timing information at all**.
+A: Executes instructions in correct order with correct data to produce correct results; gives no timing information.
 
 (b) Cycle count
 
-A: Each instruction is profiled with an execution latency in clock cycles, then in instruction-accurate order the execution times are **accumulated** to estimate total time.
+A: Each instruction is profiled with a clock-cycle latency, then accumulated in instruction-accurate order.
 
 (c) Cycle callable
 
-A: The simulator is invoked **on every clock cycle**.
+A: The simulator is invoked on every clock cycle.
 
 (d) Cycle accurate
 
-A: The execution time is accurate **to the end of each clock cycle**.
+A: Accurate to the end of each clock cycle.
 
 **Q6 (a)**
- 
+
 Q: What operations does a bus transaction perform? In other words, what is a bus transaction?
- 
-A: Addressed data read and write.
- 
+
+A: Addressed data reads and writes.
+
 **Q6 (b)**
- 
+
 Q: Describe, among all parties involved in executing a task, what 'synchronization' is (one or at most two sentences).
- 
-A: Synchronization coordinates the timing and ordering of the concurrent parties executing a task, so that dependent operations (e.g., write-before-read) happen in the correct order and race conditions are avoided.
+
+A: Synchronization coordinates the timing/ordering of the parties so dependent operations run in the correct order and avoid race conditions.
 
 **Q7 (a)**
- 
+
 Q: What is the issue represented by the double arrow between "HW implementation" and "SW/FW Implementation", and how does ESL solve it?
 
-A (Issue): HW and SW/FW implementation must be co-designed and constantly coordinated; in a traditional flow they're developed separately and only integrated late, so HW/SW partition and interface mismatches surface too late.
- 
-A (How ESL solves it): ESL provides a shared virtual platform (TLM) so HW and SW can be developed in parallel and integrated/verified early, instead of waiting until the end.
- 
+A (Issue): HW and SW/FW are designed separately and integrated too late.
+
+A (ESL): Use a virtual platform (golden model) for SW/HW co-design, co-verification; integrated early.
+
 **Q7 (b)**
- 
+
 Q: What is the issue represented by the arched arrow from "Algorithm Design & Analysis" down to "System Integration", and how does ESL solve it?
 
-A (Issue): The arched arrow represents the problem of verifying that the final integrated system stays consistent with the original algorithm design. In a traditional flow you only find out after integration is complete, and drift is hard to trace back.
+A (Issue): Verify the final integrated system matches the original algorithm; traditionally integration is checked too late.
 
-A (How ESL solves it): ESL builds a golden model (the TLM / virtual platform) that exists from the algorithm stage onward. Because this model is ready early and fast enough, every later stage (architecture, HW/SW implementation, integration) can be checked against it, ensuring the result stays faithful to the original algorithm. The final integrated system can be validated directly against the golden model, so deviations are caught early instead of at the very end.
+A (ESL): A golden model exists from the algorithm stage, so every stage checks against it.
 <img width="407" height="238" alt="image" src="https://github.com/user-attachments/assets/4a9e48b9-1e50-4ae4-89ce-bf91a3d0925f" />
